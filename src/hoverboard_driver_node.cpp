@@ -20,7 +20,16 @@ namespace hoverboard_driver_node {
         }
 
     };
-} //namespace hoverboard_driver_node
+
+    void close(){
+        serial_close(serial_);
+        serial_free(serial_);
+    };
+
+    private:
+    std::string serial_name_;
+    serial_t *serial_;
+} // namespace hoverboard_driver_node
 
 int main(int argc, char **argv) {
     // Start ROS node.
@@ -41,4 +50,5 @@ int main(int argc, char **argv) {
 
     tf::TransformBroadcaster odom_broadcaster;
 
+    hoverboard.close();
 }
