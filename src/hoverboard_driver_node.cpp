@@ -99,7 +99,7 @@ int main(int argc, char **argv) {
 
     hoverboard_instance = &hoverboard;
 
-    ros::Publisher hoverboard_pub = nh.advertise<ros_odrive::odrive_msg>("hoverboard_msg", 100);
+    ros::Publisher hoverboard_pub = node.advertise<ros_odrive::odrive_msg>("hoverboard_msg", 100);
 
     ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
 
