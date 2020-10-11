@@ -12,20 +12,25 @@
 using namespace std;
 
 namespace hoverboard_driver_node {
+
     class Hoverboard {
     public:
         Hoverboard(std::string serial_name) : serial_name_(serial_name) {
-                serial_ = serial_new();
+            serial_ = serial_new();
 
-                if (serial_open(serial_, serial_name.c_str(), 38400) < 0) {
-                    ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
-                    exit(1);
-                }
+            if (serial_open(serial_, serial_name.c_str(), 38400) < 0) {
+                ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
+                exit(1);
+            }
         }
 
     };
 
-    void close(){
+    void read_data() {
+
+    }
+
+    void close() {
         serial_close(serial_);
         serial_free(serial_);
     };
@@ -53,6 +58,12 @@ int main(int argc, char **argv) {
     ros::Subscriber hoverboard_cmd_vel = nh.subscribe("cmd_vel", 10, velCallback);
 
     tf::TransformBroadcaster odom_broadcaster;
+
+    while (ros::ok()) {
+        hoverboard.read_data();
+        ros::spinOnce();
+        rate.sleep();
+    }
 
     hoverboard.close();
 }
