@@ -21,6 +21,8 @@ namespace hoverboard_driver_node {
             int16_t 	cmd2;
             int16_t 	speedR_meas;
             int16_t 	speedL_meas;
+            int16_t 	errorR;
+            int16_t 	errorL;
             int16_t 	batVoltage;
             int16_t 	boardTemp;
             uint16_t cmdLed;
@@ -50,8 +52,16 @@ namespace hoverboard_driver_node {
                 }
 
             }
-
-
+            hoverboard_driver::hoverboard_msg msg;
+            msg.cmd1 = feedback.cmd1;
+            msg.cmd2 = feedback.cmd2;
+            msg.speedR_meas = feedback.speedR_meas;
+            msg.speedL_meas = feedback.speedL_meas;
+            msg.errorR = feedback.errorR;
+            msg.errorL = feedback.errorL;
+            msg.batVoltage = feedback.batVoltage;
+            msg.boardTemp = feedback.boardTemp;
+            msg.cmdLed = feedback.cmdLed;
         };
 
         void sendCommand();
@@ -80,8 +90,9 @@ void publish_odometry(){
 
 }
 
-void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg){
-
+void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg){
+    // Publish message
+    odrive_pub.publish(msg);
 }
 
 int main(int argc, char **argv) {
