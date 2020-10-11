@@ -108,7 +108,7 @@ int main(int argc, char **argv) {
     bool hoverboard_error = false;
 
     while (ros::ok()) {
-        hoverboard::SerialFeedback feedback = hoverboard.read_data(&hoverboard_error);
+        Hoverboard::SerialFeedback feedback = hoverboard.read_data(&hoverboard_error);
         //publish_odometry(feedback);
         ros::spinOnce();
         rate.sleep();
