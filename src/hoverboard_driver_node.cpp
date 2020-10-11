@@ -53,7 +53,7 @@ namespace hoverboard_driver_node {
 
             if (hoverboard_data[0] == 0xCD) {
 
-                if (serial_read(serial_, (byte *)&feedback, 21, 100) < 0) {
+                if (serial_read(serial_, (uint8_t *)&feedback, 21, 100) < 0) {
                     *error = true;
                 }
 
