@@ -44,7 +44,7 @@ namespace hoverboard_driver_node {
 
 } // namespace hoverboard_driver_node
 
-hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
+hoverboard_driver_node::Hoverboard hoverboard;
 
 void velCallback(const geometry_msgs::Twist &vel) {
     hoverboard.sendCommand()
@@ -60,6 +60,8 @@ int main(int argc, char **argv) {
     std::string hoverboard_uart;
 
     node.param<std::string>("hoverboard_uart", hoverboard_uart, "/dev/ttyTHS1");
+
+    hoverboard = new hoverboard_driver_node::Hoverboard(hoverboard_uart);
 
     ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
 
