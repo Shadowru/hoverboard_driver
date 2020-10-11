@@ -3,6 +3,10 @@
 #include <stdlib.h>
 #include <ros/ros.h>
 
+#include <geometry_msgs/Twist.h>
+#include <tf/transform_broadcaster.h>
+#include <nav_msgs/Odometry.h>
+
 #include "hoverboard_driver/serial.h"
 
 using namespace std;
