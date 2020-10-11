@@ -24,20 +24,20 @@ namespace hoverboard_driver_node {
             }
         }
 
-    };
+        void read_data() {
 
-    void read_data() {
+        };
 
-    }
-
-    void close() {
-        serial_close(serial_);
-        serial_free(serial_);
-    };
+        void close() {
+            serial_close(serial_);
+            serial_free(serial_);
+        };
 
     private:
-    std::string serial_name_;
-    serial_t *serial_;
+        std::string serial_name_;
+        serial_t *serial_;
+    };
+
 } // namespace hoverboard_driver_node
 
 void velCallback(const geometry_msgs::Twist &vel) {
