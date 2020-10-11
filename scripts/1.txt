@@ -1,1 +1,3 @@
 roslaunch hoverboard_driver hoverboard_driver.launch
+
+rostopic echo /hoverboard_msg
