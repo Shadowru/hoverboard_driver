@@ -46,7 +46,7 @@ namespace hoverboard_driver_node {
             }
         }
 
-        void read_data() {
+        void read_data(bool* error) {
             if (serial_read(serial_, hoverboard_data, 1, 20) < 0) {
                 *error = true;
             };
@@ -105,7 +105,10 @@ int main(int argc, char **argv) {
 
     tf::TransformBroadcaster odom_broadcaster;
 
+    bool hoverboard_error = false;
+
     while (ros::ok()) {
+        hoverboard.read_data(&hoverboard_error);
         //publish_odometry(hoverboard.read_data());
         ros::spinOnce();
         rate.sleep();
