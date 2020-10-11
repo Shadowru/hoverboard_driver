@@ -15,6 +15,28 @@ namespace hoverboard_driver_node {
 
     class Hoverboard {
     public:
+
+        typedef struct{
+            uint16_t	start;
+            int16_t  steer;
+            int16_t  speed;
+            uint16_t checksum;
+        } SerialCommand;
+        SerialCommand command;
+
+        typedef struct{
+            uint8_t start;
+            int16_t 	cmd1;
+            int16_t 	cmd2;
+            int16_t 	speedR_meas;
+            int16_t 	speedL_meas;
+            int16_t 	batVoltage;
+            int16_t 	boardTemp;
+            uint16_t cmdLed;
+            uint16_t checksum;
+        } SerialFeedback;
+        SerialFeedback feedback;
+
         Hoverboard(std::string serial_name) : serial_name_(serial_name) {
             serial_ = serial_new();
 
@@ -25,6 +47,18 @@ namespace hoverboard_driver_node {
         }
 
         void read_data() {
+            if (serial_read(serial_, hoverboard_data, 1, 20) < 0) {
+                *error = true;
+            };
+
+            if (hoverboard_data[0] == 0xCD) {
+
+                if (serial_read(serial_, (byte *)&feedback, 21, 100) < 0) {
+                    *error = true;
+                }
+
+            }
+
 
         };
 
@@ -38,6 +72,8 @@ namespace hoverboard_driver_node {
     private:
         std::string serial_name_;
         serial_t *serial_;
+        uint8_t hoverboard_data[22];
+
     };
 
 } // namespace hoverboard_driver_node
