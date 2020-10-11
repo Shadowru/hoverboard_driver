@@ -35,6 +35,7 @@ namespace hoverboard_driver_node {
             uint16_t cmdLed;
             uint16_t checksum;
         } SerialFeedback;
+
         SerialFeedback feedback;
 
         Hoverboard(std::string serial_name) : serial_name_(serial_name) {
@@ -46,7 +47,7 @@ namespace hoverboard_driver_node {
             }
         }
 
-        SerialFeedback read_data(bool* error) {
+        hoverboard_driver::hoverboard_msg read_data(bool* error) {
             if (serial_read(serial_, hoverboard_data, 1, 20) < 0) {
                 *error = true;
             };

@@ -1,4 +1,5 @@
 #include "uart_peripheral.h"
+#include "hoverboard_driver/hoverboard_msg.h"
 
 class hoverboard_driver : public uart_peripheral
 {

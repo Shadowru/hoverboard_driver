@@ -16,6 +16,16 @@ find_package(catkin REQUIRED COMPONENTS
 ## System dependencies are found with CMake's conventions
 # find_package(Boost REQUIRED COMPONENTS system)
 
+add_message_files(
+        FILES
+        hoverboard_msg.msg
+)
+
+generate_messages(
+        DEPENDENCIES
+        std_msgs
+)
+
 ###################################
 ## catkin specific configuration ##
 ###################################
