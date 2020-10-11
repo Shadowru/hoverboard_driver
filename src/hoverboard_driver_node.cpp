@@ -76,6 +76,14 @@ void velCallback(const geometry_msgs::Twist &vel) {
     //hoverboard_instance.sendCommand()
 }
 
+void publish_odometry(){
+
+}
+
+void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg){
+
+}
+
 int main(int argc, char **argv) {
     // Start ROS node.
     ROS_INFO("Starting hoverboard_driver node");
@@ -91,6 +99,8 @@ int main(int argc, char **argv) {
 
     hoverboard_instance = &hoverboard;
 
+    ros::Publisher hoverboard_pub = nh.advertise<ros_odrive::odrive_msg>("hoverboard_msg", 100);
+
     ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
 
     ros::Subscriber hoverboard_cmd_vel = node.subscribe("cmd_vel", 10, velCallback);
@@ -101,7 +111,14 @@ int main(int argc, char **argv) {
 
     while (ros::ok()) {
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
-        //publish_odometry(feedback);
+
+        if(hoverboard_error){
+            ROS_ERROR("Cnat connect to hoverboard!");
+        } else {
+            publishMessage(hoverboard_pub, feedback);
+            //publish_odometry(feedback);
+        }
+
         ros::spinOnce();
         rate.sleep();
     }
