@@ -41,7 +41,7 @@ include_directories(
         ${catkin_INCLUDE_DIRS}
 )
 
-add_executable(${PROJECT_NAME}_node src/hoverboard_driver.cpp src/serial.c)
+add_executable(${PROJECT_NAME}_node src/hoverboard_driver_node.cpp src/serial.c)
 target_link_libraries(${PROJECT_NAME}_node ${catkin_LIBRARIES})
 
 ## Rename C++ executable without prefix
