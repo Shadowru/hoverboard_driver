@@ -3,7 +3,7 @@
 #include <stdlib.h>
 #include <ros/ros.h>
 
-#include "hoverborad_driver/serial.h"
+#include "hoverboard_driver/serial.h"
 
 using namespace std;
 
