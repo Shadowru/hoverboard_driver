@@ -1,0 +1,5 @@
+<launch>
+    <node name="hoverboard_driver" pkg="hoverboard_driver" type="node" output="screen">
+        <param name="hoverboard_uart" value="/dev/ttyTHS1"/>
+    </node>
+</launch>
