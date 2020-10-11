@@ -46,7 +46,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
 int main(int argc, char **argv) {
     // Start ROS node.
-    ROS_INFO("Starting node");
+    ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
     ros::Rate rate(10);  // 10 hz
