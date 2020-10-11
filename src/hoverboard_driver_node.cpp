@@ -40,6 +40,10 @@ namespace hoverboard_driver_node {
     serial_t *serial_;
 } // namespace hoverboard_driver_node
 
+void velCallback(const geometry_msgs::Twist &vel) {
+
+}
+
 int main(int argc, char **argv) {
     // Start ROS node.
     ROS_INFO("Starting node");
@@ -53,9 +57,9 @@ int main(int argc, char **argv) {
 
     hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
 
-    ros::Publisher hoverboard_odometry = nh.advertise<nav_msgs::Odometry>("odometry", 100);
+    ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
 
-    ros::Subscriber hoverboard_cmd_vel = nh.subscribe("cmd_vel", 10, velCallback);
+    ros::Subscriber hoverboard_cmd_vel = node.subscribe("cmd_vel", 10, velCallback);
 
     tf::TransformBroadcaster odom_broadcaster;
 
