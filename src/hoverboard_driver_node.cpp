@@ -42,7 +42,7 @@ namespace hoverboard_driver_node {
 
 } // namespace hoverboard_driver_node
 
-hoverboard_driver_node::Hoverboard hoverboard_instance;
+hoverboard_driver_node::Hoverboard *hoverboard_instance;
 
 void velCallback(const geometry_msgs::Twist &vel) {
     //hoverboard_instance.sendCommand()
