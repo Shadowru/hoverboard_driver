@@ -62,6 +62,11 @@ namespace hoverboard_driver_node {
             msg.batVoltage = feedback.batVoltage;
             msg.boardTemp = feedback.boardTemp;
             msg.cmdLed = feedback.cmdLed;
+
+            *error = false;
+
+            return msg;
+
         };
 
         void sendCommand();
@@ -75,7 +80,6 @@ namespace hoverboard_driver_node {
         std::string serial_name_;
         serial_t *serial_;
         uint8_t hoverboard_data[22];
-
     };
 
 } // namespace hoverboard_driver_node
@@ -124,7 +128,7 @@ int main(int argc, char **argv) {
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
 
         if(hoverboard_error){
-            ROS_ERROR("Cnat connect to hoverboard!");
+            ROS_ERROR("Can't connect to hoverboard!");
         } else {
             publishMessage(hoverboard_pub, feedback);
             //publish_odometry(feedback);
