@@ -28,9 +28,7 @@ namespace hoverboard_driver_node {
 
         };
 
-        void sendCommand(){
-
-        }
+        void sendCommand();
 
         void close() {
             serial_close(serial_);
@@ -44,15 +42,15 @@ namespace hoverboard_driver_node {
 
 } // namespace hoverboard_driver_node
 
-hoverboard_driver_node::Hoverboard hoverboard;
+hoverboard_driver_node::Hoverboard &hoverboard_instance;
 
 void velCallback(const geometry_msgs::Twist &vel) {
-    hoverboard.sendCommand()
+    //hoverboard_instance.sendCommand()
 }
 
 int main(int argc, char **argv) {
     // Start ROS node.
-    ROS_INFO("Starting hoverboard driver node");
+    ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
     ros::Rate rate(10);  // 10 hz
@@ -61,7 +59,9 @@ int main(int argc, char **argv) {
 
     node.param<std::string>("hoverboard_uart", hoverboard_uart, "/dev/ttyTHS1");
 
-    hoverboard = new hoverboard_driver_node::Hoverboard(hoverboard_uart);
+    hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
+
+    hoverboard_instance = &hoverboard;
 
     ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
 
