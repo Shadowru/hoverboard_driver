@@ -14,7 +14,10 @@ namespace hoverboard_driver_node {
                 exit(1);
             }
 
-            serial_input_waiting(serial_, 50);
+            //TODO : param
+            unsigned int buffer_size = 50;
+
+            serial_input_waiting(serial_, buffer_size);
 
             last_steer = 0;
             last_speed = 0;
