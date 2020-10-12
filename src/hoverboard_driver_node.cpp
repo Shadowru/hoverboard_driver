@@ -94,7 +94,7 @@ namespace hoverboard_driver_node {
             hoverboard_command[idx++]=(checksum >> 8);
 
             if(serial_write(serial_, hoverboard_command, 8) < 0){
-                ROS_ERORR("Write command error!");
+                ROS_ERROR("Write command error!");
                 return false;
             };
 
