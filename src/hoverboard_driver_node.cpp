@@ -79,7 +79,7 @@ namespace hoverboard_driver_node {
             return msg;
         };
 
-        boolean sendCommand(uint16_t steer, uint16_t speed){
+        bool sendCommand(uint16_t steer, uint16_t speed){
             uint8_t hoverboard_command[8];
             uint16_t checksum = start ^ steer ^ speed;
             idx = 0;
@@ -156,7 +156,7 @@ int main(int argc, char **argv) {
 
     while (ros::ok()) {
 
-        hoverboard.sendCommand(0, 50);
+        bool send_ok = hoverboard.sendCommand(0, 50);
 
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
 
