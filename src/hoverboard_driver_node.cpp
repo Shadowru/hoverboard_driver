@@ -165,7 +165,11 @@ void velCallback(const geometry_msgs::Twist &vel) {
     hoverboard_instance->setSpeed(speed);
 }
 
-void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
+void publish_odometry(ros::Publisher odometry_pub,
+                      hoverboard_driver::hoverboard_msg feedback,
+                      tf::TransformBroadcaster odom_broadcaster,
+                      const ros::Time current_time,
+                      const ros::Time last_time) {
     // Forward
     // speedR_meas - negative
     // speedL_meas - positive
@@ -284,7 +288,7 @@ int main(int argc, char **argv) {
             ROS_ERROR("Can't connect to hoverboard!");
         } else {
             publishMessage(hoverboard_pub, feedback);
-            publish_odometry(hoverboard_odometry, feedback);
+            publish_odometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
         }
 
         ros::spinOnce();
