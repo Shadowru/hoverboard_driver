@@ -122,7 +122,8 @@ void velCallback(const geometry_msgs::Twist &vel) {
         return;
     }
 
-    float v = vel.linear.x;
+    //RPM
+    float v = vel.linear.x * 60;
     float w = vel.angular.z;
 
     float rpm = rpm_per_meter * v;
