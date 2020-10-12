@@ -121,7 +121,7 @@ void setInstance(hoverboard_driver_node::Hoverboard *instance){
 }
 
 void velCallback(const geometry_msgs::Twist &vel) {
-    //hoverboard_instance.sendCommand()
+    hoverboard_instance->sendCommand(0, 50);
 }
 
 void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
