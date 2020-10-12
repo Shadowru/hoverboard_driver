@@ -1,3 +1,5 @@
+sudo chmod 0666 /dev/ttyTHS1
+
 roslaunch hoverboard_driver hoverboard_driver.launch
 
 rostopic echo /hoverboard_msg

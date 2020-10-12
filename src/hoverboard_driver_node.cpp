@@ -140,6 +140,13 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
     float rpm = rpm_per_meter * v;
 
+    if(rpm > 0.0 && rpm < 1.0){
+        rpm = 1;
+    } else
+    if(rpm  < 0.0 && rpm > -1.0){
+        rpm = -1;
+    }
+
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
     int16_t steer = static_cast<int>(-1 * w * 200);
