@@ -55,15 +55,15 @@ namespace hoverboard_driver_node {
 
             int idx = 1;
 
-            msg.cmd1 = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmd1;
-            msg.cmd2 = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmd2;
-            msg.speedR_meas = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.speedR_meas;
-            msg.speedL_meas = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.speedL_meas;
-            msg.errorR = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorR;
-            msg.errorL = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorL;
-            msg.batVoltage = (hoverboard_data[idx++]) + (hoverboard_data[idx++]<< 8);//feedback.batVoltage;
-            msg.boardTemp = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.boardTemp;
-            msg.cmdLed = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmdLed;
+            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmd1;
+            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmd2;
+            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.speedR_meas;
+            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.speedL_meas;
+            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.errorR;
+            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.errorL;
+            msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.batVoltage;
+            msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.boardTemp;
+            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmdLed;
 
             *error = false;
 
