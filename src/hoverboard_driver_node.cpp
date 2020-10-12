@@ -6,31 +6,6 @@ namespace hoverboard_driver_node {
 
     class Hoverboard {
     public:
-
-        typedef struct {
-            uint16_t start;
-            int16_t steer;
-            int16_t speed;
-            uint16_t checksum;
-        } SerialCommand;
-        SerialCommand command;
-
-        typedef struct {
-            uint8_t start;
-            int16_t cmd1;
-            int16_t cmd2;
-            int16_t speedR_meas;
-            int16_t speedL_meas;
-            int16_t errorR;
-            int16_t errorL;
-            int16_t batVoltage;
-            int16_t boardTemp;
-            uint16_t cmdLed;
-            uint16_t checksum;
-        } SerialFeedback;
-
-        SerialFeedback feedback;
-
         Hoverboard(std::string serial_name) : serial_name_(serial_name) {
             serial_ = serial_new();
 
@@ -79,7 +54,7 @@ namespace hoverboard_driver_node {
             return msg;
         };
 
-        bool sendCommand(uint16_t steer, uint16_t speed){
+        bool sendCommand(int16_t steer, int16_t speed){
             uint8_t hoverboard_command[8];
             uint16_t start = 0xABCD;
             uint16_t checksum = start ^ steer ^ speed;
@@ -114,13 +89,28 @@ namespace hoverboard_driver_node {
 
 } // namespace hoverboard_driver_node
 
-hoverboard_driver_node::Hoverboard *hoverboard_instance;
+hoverboard_driver_node::Hoverboard *hoverboard_instance = NULL;
+
+float wheel_radius;
+float wheel_circum;
+float rpm_per_meter;
 
 void setInstance(hoverboard_driver_node::Hoverboard *instance){
     hoverboard_instance = instance;
 }
 
 void velCallback(const geometry_msgs::Twist &vel) {
+
+    if(hoverboard_instance == NULL){
+        return;
+    }
+
+    float v = vel.linear.x;
+    float w = vel.angular.z;
+
+    int16_t speed = ;
+
+
     hoverboard_instance->sendCommand(0, 50);
 }
 
@@ -148,6 +138,13 @@ int main(int argc, char **argv) {
     hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
 
     setInstance(&hoverboard);
+
+    node.param<float>("base_width", base_width, 0.43);
+    node.param<float>("wheel_radius", wheel_radius, 0.235 / 2);
+
+    wheel_circum = 2.0 * wheel_radius * M_PI;
+
+    rpm_per_meter = 1 / wheel_circum;
 
     ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 100);
 
