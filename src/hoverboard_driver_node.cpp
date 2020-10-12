@@ -13,6 +13,8 @@ namespace hoverboard_driver_node {
                 ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
                 exit(1);
             }
+            last_steer = 0;
+            last_speed = 0;
         }
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
@@ -76,6 +78,18 @@ namespace hoverboard_driver_node {
             return true;
         };
 
+        bool setSteer(int16_t steer){
+            last_steer = steer;
+        };
+
+        bool setSpeed(int16_t speed){
+            last_speed = speed;
+        };
+
+        bool resendCommand(){
+            sendCommand(last_steer, last_speed);
+        };
+
         void close() {
             serial_close(serial_);
             serial_free(serial_);
@@ -85,6 +99,8 @@ namespace hoverboard_driver_node {
         std::string serial_name_;
         serial_t *serial_;
         uint8_t hoverboard_data[22];
+        int16_t last_steer;
+        int16_t last_speed;
     };
 
 } // namespace hoverboard_driver_node
@@ -113,7 +129,8 @@ void velCallback(const geometry_msgs::Twist &vel) {
     //TODO: calc
     int16_t steer = w * 50;
 
-    hoverboard_instance->sendCommand(steer, speed);
+    hoverboard_instance->setSteer(steer);
+    hoverboard_instance->setSpeed(speed);
 }
 
 void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
@@ -160,7 +177,8 @@ int main(int argc, char **argv) {
 
     while (ros::ok()) {
 
-        bool send_ok = hoverboard.sendCommand(0, 50);
+        //command hoverboard
+        bool send_ok = hoverboard.resendCommand();
 
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
 
