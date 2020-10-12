@@ -79,7 +79,26 @@ namespace hoverboard_driver_node {
             return msg;
         };
 
-        void sendCommand();
+        boolean sendCommand(uint16_t steer, uint16_t speed){
+            uint8_t hoverboard_command[8];
+            uint16_t checksum = start ^ steer ^ speed;
+            idx = 0;
+            hoverboard_command[idx++]= start & 0xff;
+            hoverboard_command[idx++]=(start >> 8);
+            hoverboard_command[idx++]= steer & 0xff;
+            hoverboard_command[idx++]=(steer >> 8);
+            hoverboard_command[idx++]= speed & 0xff;
+            hoverboard_command[idx++]=(speed >> 8);
+            hoverboard_command[idx++]= checksum & 0xff;
+            hoverboard_command[idx++]=(checksum >> 8);
+
+            if(serial_write(serial_, hoverboard_command, 8) < 0){
+                ROS_ERORR("Write command error!");
+                return false;
+            };
+
+            return true;
+        };
 
         void close() {
             serial_close(serial_);
@@ -101,7 +120,8 @@ void velCallback(const geometry_msgs::Twist &vel) {
 }
 
 void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
-
+    int current_rpm_left = feedback.speedL_meas;
+    int current_rpm_right = feedback.speedR_meas;
 }
 
 void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg) {
@@ -135,6 +155,9 @@ int main(int argc, char **argv) {
     bool hoverboard_error = false;
 
     while (ros::ok()) {
+
+        hoverboard.sendCommand(0, 50);
+
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
 
         if (hoverboard_error) {
