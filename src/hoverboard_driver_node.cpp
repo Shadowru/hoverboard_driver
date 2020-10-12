@@ -91,6 +91,7 @@ namespace hoverboard_driver_node {
 
 hoverboard_driver_node::Hoverboard *hoverboard_instance = NULL;
 
+float base_width;
 float wheel_radius;
 float wheel_circum;
 float rpm_per_meter;
@@ -108,10 +109,11 @@ void velCallback(const geometry_msgs::Twist &vel) {
     float v = vel.linear.x;
     float w = vel.angular.z;
 
-    int16_t speed = ;
+    int16_t speed = rpm_per_meter * v;
+    //TODO: calc
+    int16_t steer = w * 50;
 
-
-    hoverboard_instance->sendCommand(0, 50);
+    hoverboard_instance->sendCommand(steer, speed);
 }
 
 void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
