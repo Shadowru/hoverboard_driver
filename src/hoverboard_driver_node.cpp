@@ -116,6 +116,10 @@ namespace hoverboard_driver_node {
 
 hoverboard_driver_node::Hoverboard *hoverboard_instance;
 
+void setInstance(*instance){
+    hoverboard_instance = instance;
+}
+
 void velCallback(const geometry_msgs::Twist &vel) {
     //hoverboard_instance.sendCommand()
 }
@@ -143,7 +147,7 @@ int main(int argc, char **argv) {
 
     hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
 
-    hoverboard_instance = &hoverboard;
+    setInstance(&hoverboard);
 
     ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 100);
 

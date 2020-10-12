@@ -1,3 +1,13 @@
 roslaunch hoverboard_driver hoverboard_driver.launch
 
 rostopic echo /hoverboard_msg
+
+cmd1: 0
+cmd2: 50
+speedR_meas: -6
+speedL_meas: 5
+errorR: 0
+errorL: 0
+batVoltage: 4028
+boardTemp: 269
+cmdLed: 0
