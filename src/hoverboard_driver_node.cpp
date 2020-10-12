@@ -61,7 +61,7 @@ namespace hoverboard_driver_node {
             msg.speedL_meas = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.speedL_meas;
             msg.errorR = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorR;
             msg.errorL = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorL;
-            msg.batVoltage = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.batVoltage;
+            msg.batVoltage = (hoverboard_data[idx++]) + (hoverboard_data[idx++]<< 8);//feedback.batVoltage;
             msg.boardTemp = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.boardTemp;
             msg.cmdLed = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmdLed;
 
