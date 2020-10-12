@@ -58,7 +58,7 @@ namespace hoverboard_driver_node {
 
         bool sendCommand(int16_t steer, int16_t speed){
 
-            ROS_INFO("Send command : %d - %d", steer, speed);
+            //ROS_DEBUG("Send command : %d - %d", steer, speed);
 
             uint8_t hoverboard_command[8];
             uint16_t start = 0xABCD;
@@ -137,7 +137,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
-    int16_t steer = static_cast<int>(w * 50);
+    int16_t steer = static_cast<int>(w * 100);
 
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
