@@ -149,7 +149,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
-    int16_t steer = static_cast<int>(-1 * w * 200);
+    int16_t steer = static_cast<int>(-1 * w * 50);
 
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
