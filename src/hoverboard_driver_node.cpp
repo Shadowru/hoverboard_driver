@@ -81,6 +81,7 @@ namespace hoverboard_driver_node {
 
         bool sendCommand(uint16_t steer, uint16_t speed){
             uint8_t hoverboard_command[8];
+            uint16_t start = 0xABCD;
             uint16_t checksum = start ^ steer ^ speed;
             int idx = 0;
             hoverboard_command[idx++]= start & 0xff;
