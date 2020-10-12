@@ -182,7 +182,7 @@ void publish_odometry(ros::Publisher odometry_pub,
     right_pos = current_feedback_right;
     left_pos = current_feedback_left;
 
-    int uniform_constant = 50;
+    float uniform_constant = 5.0;
 
     float delta_right_wheel_in_meter = curr_right_pos / uniform_constant;
     float delta_left_wheel_in_meter = curr_left_pos / uniform_constant;
