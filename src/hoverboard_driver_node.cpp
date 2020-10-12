@@ -57,6 +57,9 @@ namespace hoverboard_driver_node {
         };
 
         bool sendCommand(int16_t steer, int16_t speed){
+
+            ROS_INFO("Send command : %d - %d", steer, speed);
+
             uint8_t hoverboard_command[8];
             uint16_t start = 0xABCD;
             uint16_t checksum = start ^ steer ^ speed;
