@@ -13,6 +13,9 @@ namespace hoverboard_driver_node {
                 ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
                 exit(1);
             }
+
+            serial_input_waiting(serial_, 50);
+
             last_steer = 0;
             last_speed = 0;
         }
@@ -77,6 +80,8 @@ namespace hoverboard_driver_node {
                 ROS_ERROR("Write command error!");
                 return false;
             };
+
+            serial_flush(serial_);
 
             return true;
         };
@@ -157,7 +162,7 @@ int main(int argc, char **argv) {
     ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
-    ros::Rate rate(60);  // 60 hz
+    ros::Rate rate(100);  // 100 hz
 
     std::string hoverboard_uart;
 
