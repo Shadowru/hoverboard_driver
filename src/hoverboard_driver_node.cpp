@@ -7,24 +7,24 @@ namespace hoverboard_driver_node {
     class Hoverboard {
     public:
 
-        typedef struct{
-            uint16_t	start;
-            int16_t  steer;
-            int16_t  speed;
+        typedef struct {
+            uint16_t start;
+            int16_t steer;
+            int16_t speed;
             uint16_t checksum;
         } SerialCommand;
         SerialCommand command;
 
-        typedef struct{
+        typedef struct {
             uint8_t start;
-            int16_t 	cmd1;
-            int16_t 	cmd2;
-            int16_t 	speedR_meas;
-            int16_t 	speedL_meas;
-            int16_t 	errorR;
-            int16_t 	errorL;
-            int16_t 	batVoltage;
-            int16_t 	boardTemp;
+            int16_t cmd1;
+            int16_t cmd2;
+            int16_t speedR_meas;
+            int16_t speedL_meas;
+            int16_t errorR;
+            int16_t errorL;
+            int16_t batVoltage;
+            int16_t boardTemp;
             uint16_t cmdLed;
             uint16_t checksum;
         } SerialFeedback;
@@ -40,28 +40,30 @@ namespace hoverboard_driver_node {
             }
         }
 
-        hoverboard_driver::hoverboard_msg read_data(bool* error) {
+        hoverboard_driver::hoverboard_msg read_data(bool *error) {
             if (serial_read(serial_, hoverboard_data, 1, 20) < 0) {
                 *error = true;
             };
 
             if (hoverboard_data[0] == 0xCD) {
-
-                if (serial_read(serial_, (uint8_t *)&feedback, 21, 100) < 0) {
+                if (serial_read(serial_, hoverboard_data, 21, 100) < 0) {
                     *error = true;
                 }
-
             }
+
             hoverboard_driver::hoverboard_msg msg;
-            msg.cmd1 = feedback.cmd1;
-            msg.cmd2 = feedback.cmd2;
-            msg.speedR_meas = feedback.speedR_meas;
-            msg.speedL_meas = feedback.speedL_meas;
-            msg.errorR = feedback.errorR;
-            msg.errorL = feedback.errorL;
-            msg.batVoltage = feedback.batVoltage;
-            msg.boardTemp = feedback.boardTemp;
-            msg.cmdLed = feedback.cmdLed;
+
+            int idx = 1;
+
+            msg.cmd1 = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmd1;
+            msg.cmd2 = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmd2;
+            msg.speedR_meas = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.speedR_meas;
+            msg.speedL_meas = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.speedL_meas;
+            msg.errorR = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorR;
+            msg.errorL = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.errorL;
+            msg.batVoltage = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.batVoltage;
+            msg.boardTemp = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.boardTemp;
+            msg.cmdLed = (hoverboard_data[idx++]<< 8) + hoverboard_data[idx++];//feedback.cmdLed;
 
             *error = false;
 
@@ -90,11 +92,11 @@ void velCallback(const geometry_msgs::Twist &vel) {
     //hoverboard_instance.sendCommand()
 }
 
-void publish_odometry(){
+void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
 
 }
 
-void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg){
+void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg) {
     // Publish message
     odrive_pub.publish(msg);
 }
@@ -127,11 +129,11 @@ int main(int argc, char **argv) {
     while (ros::ok()) {
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
 
-        if(hoverboard_error){
+        if (hoverboard_error) {
             ROS_ERROR("Can't connect to hoverboard!");
         } else {
             publishMessage(hoverboard_pub, feedback);
-            //publish_odometry(feedback);
+            publish_odometry(hoverboard_odometry, feedback);
         }
 
         ros::spinOnce();
