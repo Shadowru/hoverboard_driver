@@ -65,10 +65,18 @@ namespace hoverboard_driver_node {
             msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.boardTemp;
             msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmdLed;
 
-            *error = false;
+            uint16_t msg_checksum = hoverboard_data[19] + (hoverboard_data[20]<< 8);
+
+            uint16_t calc_checksum = 0xABCD ^ msg.cmd1 ^ msg.cmd2 ^ msg.speedR_meas ^ msg.speedL_meas ^ msg.batVoltage ^ msg.boardTemp ^ msg.cmdLed;
+
+            if(msg_checksum != calc_checksum){
+                ROS_ERROR("Checksum wrong!: ");
+                *error = true;
+            } else {
+                *error = false;
+            }
 
             return msg;
-
         };
 
         void sendCommand();
