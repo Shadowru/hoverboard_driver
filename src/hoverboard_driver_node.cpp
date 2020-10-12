@@ -122,8 +122,8 @@ float wheel_radius;
 float wheel_circum;
 float rpm_per_meter;
 
-int right_pos;
-int left_pos;
+int right_pos = 0;
+int left_pos = 0;
 
 ros::Time current_time, last_time;
 
@@ -178,6 +178,9 @@ void publish_odometry(ros::Publisher odometry_pub,
 
     int curr_right_pos = current_feedback_right - right_pos;
     int curr_left_pos = current_feedback_left - left_pos;
+
+    right_pos = current_feedback_right;
+    left_pos = current_feedback_left;
 
     int uniform_constant = 5;
 
