@@ -168,6 +168,8 @@ int main(int argc, char **argv) {
 
     rpm_per_meter = 1 / wheel_circum;
 
+    ROS_INFO("rpm_per_meter : %f", rpm_per_meter);
+
     ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 100);
 
     ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
