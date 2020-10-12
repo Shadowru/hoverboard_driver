@@ -116,7 +116,7 @@ namespace hoverboard_driver_node {
 
 hoverboard_driver_node::Hoverboard *hoverboard_instance;
 
-void setInstance(*instance){
+void setInstance(hoverboard_driver_node::Hoverboard *instance){
     hoverboard_instance = instance;
 }
 
