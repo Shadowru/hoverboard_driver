@@ -2,6 +2,8 @@ roslaunch hoverboard_driver hoverboard_driver.launch
 
 rostopic echo /hoverboard_msg
 
+rostopic hz /hoverboard_msg
+
 cmd1: 0
 cmd2: 50
 speedR_meas: -6
@@ -11,3 +13,12 @@ errorL: 0
 batVoltage: 4028
 boardTemp: 269
 cmdLed: 0
+
+rostopic pub /cmd_vel geometry_msgs/Twist "linear:
+  x: 0.5
+  y: 0.0
+  z: 0.0
+angular:
+  x: 0.0
+  y: 0.0
+  z: 0.0" -r 3

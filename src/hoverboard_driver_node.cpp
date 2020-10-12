@@ -129,6 +129,9 @@ void velCallback(const geometry_msgs::Twist &vel) {
     //TODO: calc
     int16_t steer = w * 50;
 
+    ROS_INFO("Set speed : %d", speed);
+    ROS_INFO("Set steer : %d", steer);
+
     hoverboard_instance->setSteer(steer);
     hoverboard_instance->setSpeed(speed);
 }
