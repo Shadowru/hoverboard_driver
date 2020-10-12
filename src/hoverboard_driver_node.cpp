@@ -1,7 +1,5 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
-using namespace std;
-
 namespace hoverboard_driver_node {
 
     class Hoverboard {
@@ -124,6 +122,15 @@ float wheel_radius;
 float wheel_circum;
 float rpm_per_meter;
 
+int right_pos;
+int left_pos;
+
+ros::Time current_time, last_time;
+
+float global_x;
+float global_y;
+float global_theta;
+
 void setInstance(hoverboard_driver_node::Hoverboard *instance){
     hoverboard_instance = instance;
 }
@@ -134,7 +141,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
         return;
     }
 
-    //RPM
+    //TODO : calc rpm
     float v = vel.linear.x * 10;// * 60;
     float w = vel.angular.z;
 
@@ -159,8 +166,62 @@ void velCallback(const geometry_msgs::Twist &vel) {
 }
 
 void publish_odometry(ros::Publisher hoverboard_odometry, hoverboard_driver::hoverboard_msg feedback) {
-    int current_rpm_left = feedback.speedL_meas;
-    int current_rpm_right = feedback.speedR_meas;
+    // Forward
+    // speedR_meas - negative
+    // speedL_meas - positive
+    int current_feedback_left = feedback.speedL_meas;
+    int current_feedback_right = -1 * feedback.speedR_meas;
+
+    int curr_right_pos = current_feedback_right - right_pos;
+    int curr_left_pos = current_feedback_left - left_pos;
+
+    int uniform_constant = 5;
+
+    float delta_right_wheel_in_meter = curr_right_pos / uniform_constant;
+    float delta_left_wheel_in_meter = curr_left_pos / uniform_constant;
+
+    float local_theta = (delta_right_wheel_in_meter - delta_left_wheel_in_meter) / base_width;
+
+    float distance = (delta_right_wheel_in_meter + delta_left_wheel_in_meter) / 2;
+
+    ros::Duration ros_time_elapsed = current_time - last_time;
+    float time_elapsed = ros_time_elapsed.toSec();
+
+    float local_x = cos(global_theta) * distance;
+    float local_y = -sin(global_theta) * distance;
+
+    global_x = global_x + (cos(global_theta) * local_x - sin(global_theta) * local_y);
+    global_y = global_y + (sin(global_theta) * local_x + cos(global_theta) * local_y);
+
+    global_theta += local_theta;
+
+    //global_theta = math.atan2(math.sin(global_theta), math.cos(global_theta));
+
+    tf::Quaternion quaternion;
+    quaternion.setRPY(0, 0, global_theta);
+
+    ros::Time now_time = ros::Time::now();
+
+    tf::Transform transform;
+    transform.setOrigin(tf::Vector3(global_x, global_y, 0.0));
+    transform.setRotation(quaternion);
+
+    odom_broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "odom"));
+
+    nav_msgs::Odometry odom;
+    odom.header.stamp = now_time;
+    odom.header.frame_id = "odom";
+    odom.pose.pose.position.x = global_x;
+    odom.pose.pose.position.y = global_y;
+    odom.pose.pose.position.z = 0;
+    odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(global_theta);
+    odom.child_frame_id = "base_link";
+    odom.twist.twist.linear.x = distance / time_elapsed;
+    odom.twist.twist.linear.y = 0;
+    odom.twist.twist.angular.z = local_theta / time_elapsed;
+    odometry_pub.publish(odom);
+
+
 }
 
 void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg) {
@@ -191,6 +252,9 @@ int main(int argc, char **argv) {
     rpm_per_meter = 1 / wheel_circum;
 
     ROS_INFO("rpm_per_meter : %f", rpm_per_meter);
+
+    current_time = ros::Time::now();
+    last_time = ros::Time::now();
 
     ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 100);
 

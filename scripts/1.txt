@@ -16,6 +16,17 @@ batVoltage: 4028
 boardTemp: 269
 cmdLed: 0
 
+cmd1: 0
+cmd2: 6
+speedR_meas: -7
+speedL_meas: 8
+errorR: 0
+errorL: 0
+batVoltage: 3977
+boardTemp: 347
+cmdLed: 0
+
+
 rostopic pub /cmd_vel geometry_msgs/Twist -- '[0.5,0.0,0.0]' '[0.0, 0.0, 0.0]'
 
 rostopic pub /cmd_vel geometry_msgs/Twist -- '[0.0,0.0,0.0]' '[0.0, 0.0, 0.3]'
