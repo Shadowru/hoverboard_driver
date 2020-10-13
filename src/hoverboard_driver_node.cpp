@@ -187,7 +187,7 @@ void publish_odometry(ros::Publisher odometry_pub,
     float current_rps_right = current_feedback_right / 60.0;
 
     float delta_right_wheel_in_meter = current_rps_left * time_elapsed;
-    float delta_left_wheel_in_meter = curr_left_pos * time_elapsed;
+    float delta_left_wheel_in_meter = current_rps_right * time_elapsed;
 
     float local_theta = (delta_right_wheel_in_meter - delta_left_wheel_in_meter) / base_width;
 
