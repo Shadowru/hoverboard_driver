@@ -262,9 +262,9 @@ int main(int argc, char **argv) {
     current_time = ros::Time::now();
     last_time = ros::Time::now();
 
-    ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 100);
+    ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 20);
 
-    ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 100);
+    ros::Publisher hoverboard_odometry = node.advertise<nav_msgs::Odometry>("odometry", 20);
 
     ros::Subscriber hoverboard_cmd_vel = node.subscribe("cmd_vel", 10, velCallback);
 
