@@ -278,7 +278,7 @@ int main(int argc, char **argv) {
     while (ros::ok()) {
 
         //command hoverboard
-        if(counter++ > 4) {
+        if(counter++ > 5) {
             bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
