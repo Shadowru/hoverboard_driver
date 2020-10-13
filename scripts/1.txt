@@ -43,3 +43,33 @@ angular:
 
 rosrun teleop_twist_keyboard teleop_twist_keyboard.py
 rosrun teleop_twist_joy teleop_node
+
+
+speed = 30
+1 rotate per 2 sec
+
+speed = 20
+1 rotate per 3 sec
+
+speed = 10
+1 rotate per 6 sec
+
+speed = 6
+1 rotate per 11 sec
+
+speed = 3
+1 rotate per 18 sec
+0,0185185185185185
+
+speed = 2
+1 rotate per 24 sec
+0,0416666666666667
+0,0208333333333333
+
+speed = 1
+1 rotate per 44 sec
+0,022727
+
+{11,6},{18, 3},{24, 2},{44, 1}
+{6,11},{3, 18},{2, 24},{1, 44}
+

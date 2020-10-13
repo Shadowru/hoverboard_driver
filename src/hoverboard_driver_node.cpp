@@ -141,11 +141,13 @@ void velCallback(const geometry_msgs::Twist &vel) {
         return;
     }
 
-    //TODO : calc rpm
-    float v = vel.linear.x * 10;// * 60;
+    float v = vel.linear.x;// * 60;
     float w = vel.angular.z;
 
-    float rpm = rpm_per_meter * v;
+    float rps = v / rpm_per_meter;
+
+    //So it's rpm - rotate per minute
+    float rpm = rps * 60;
 
     if(rpm > 0.0 && rpm < 1.0){
         rpm = 1;
@@ -241,7 +243,7 @@ int main(int argc, char **argv) {
     ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
-    ros::Rate rate(100);  // 100 hz
+    ros::Rate rate(50);  // 100 hz
 
     std::string hoverboard_uart;
 
@@ -280,7 +282,7 @@ int main(int argc, char **argv) {
 
         counter++;
         //command hoverboard
-        if(counter > 6) {
+        if(counter > 5) {
             bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
