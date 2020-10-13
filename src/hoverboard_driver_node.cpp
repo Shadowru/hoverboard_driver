@@ -141,7 +141,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
         return;
     }
 
-    float v = vel.linear.x;// * 60;
+    float v = vel.linear.x;
     float w = vel.angular.z;
 
     float rps = v / rpm_per_meter;
@@ -172,29 +172,26 @@ void publish_odometry(ros::Publisher odometry_pub,
                       tf::TransformBroadcaster odom_broadcaster,
                       const ros::Time current_time,
                       const ros::Time last_time) {
+    ros::Duration ros_time_elapsed = current_time - last_time;
+    float time_elapsed = ros_time_elapsed.toSec();
+
     // Forward
     // speedR_meas - negative
     // speedL_meas - positive
     int current_feedback_left = feedback.speedL_meas;
     int current_feedback_right = -1 * feedback.speedR_meas;
 
-    int curr_right_pos = current_feedback_right - right_pos;
-    int curr_left_pos = current_feedback_left - left_pos;
+    //Assume feedback is rpm
+    //rpm to meters
+    float current_rps_left = current_feedback_left / 60.0;
+    float current_rps_right = current_feedback_right / 60.0;
 
-    right_pos = current_feedback_right;
-    left_pos = current_feedback_left;
-
-    float uniform_constant = 5.0;
-
-    float delta_right_wheel_in_meter = curr_right_pos / uniform_constant;
-    float delta_left_wheel_in_meter = curr_left_pos / uniform_constant;
+    float delta_right_wheel_in_meter = current_rps_left * time_elapsed;
+    float delta_left_wheel_in_meter = curr_left_pos * time_elapsed;
 
     float local_theta = (delta_right_wheel_in_meter - delta_left_wheel_in_meter) / base_width;
 
     float distance = (delta_right_wheel_in_meter + delta_left_wheel_in_meter) / 2;
-
-    ros::Duration ros_time_elapsed = current_time - last_time;
-    float time_elapsed = ros_time_elapsed.toSec();
 
     float local_x = cos(global_theta) * distance;
     float local_y = -sin(global_theta) * distance;
@@ -280,9 +277,8 @@ int main(int argc, char **argv) {
 
     while (ros::ok()) {
 
-        counter++;
         //command hoverboard
-        if(counter > 5) {
+        if(counter++ > 4) {
             bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
