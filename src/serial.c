@@ -68,7 +68,7 @@ void serial_free(serial_t *serial) {
 
 void flush_serial_recv_buffer(serial_t *serial) {
     usleep(1000);
-    ioctl(serial_->fd, TCFLSH, 0); // flush receive
+    ioctl(serial_t->fd, TCFLSH, 0); // flush receive
 }
 
 static int _serial_baudrate_to_bits(uint32_t baudrate) {
