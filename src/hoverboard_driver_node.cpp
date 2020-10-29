@@ -113,7 +113,7 @@ namespace hoverboard_driver_node {
     private:
         std::string serial_name_;
         serial_t *serial_;
-        uint8_t hoverboard_data[22];
+        uint8_t hoverboard_data[30];
         int16_t last_steer;
         int16_t last_speed;
         //TODO : param
