@@ -3,6 +3,8 @@
 #define HEADER_READ_TIMEOUT 10
 #define BODY_READ_TIMEOUT 50
 
+#define RCV_BUFFER_SIZE 30
+
 namespace hoverboard_driver_node {
 
     class Hoverboard {
@@ -26,6 +28,12 @@ namespace hoverboard_driver_node {
         }
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
+
+            std::fill(
+                    hoverboard_data,
+                    &hoverboard_data[0],
+                    &hoverboard_data[RCV_BUFFER_SIZE - 1],
+                    ,0);
 
             hoverboard_driver::hoverboard_msg msg;
 
@@ -118,7 +126,7 @@ namespace hoverboard_driver_node {
     private:
         std::string serial_name_;
         serial_t *serial_;
-        uint8_t hoverboard_data[50];
+        uint8_t hoverboard_data[RCV_BUFFER_SIZE];
         int16_t last_steer;
         int16_t last_speed;
         //TODO : param
