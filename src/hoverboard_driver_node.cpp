@@ -27,18 +27,19 @@ namespace hoverboard_driver_node {
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
 
+            hoverboard_driver::hoverboard_msg msg;
+
             if (serial_read(serial_, hoverboard_data, 1, HEADER_READ_TIMEOUT) < 0) {
                 *error = true;
-                return NULL;
+                return msg;
             };
 
             if (hoverboard_data[0] == 0xCD) {
                 if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
                     *error = true;
+                    return msg;
                 }
             }
-
-            hoverboard_driver::hoverboard_msg msg;
 
             int idx = 1;
 
