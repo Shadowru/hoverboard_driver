@@ -36,11 +36,15 @@ namespace hoverboard_driver_node {
 
             hoverboard_driver::hoverboard_msg msg;
 
-            if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
-                ROS_ERROR("serial_read");
-                *error = true;
-                return msg;
-            };
+            int cnt = 0;
+
+            while(hdr_start_byte != 0xCD && cnt++ < 5) {
+                if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
+                    ROS_ERROR("serial_read");
+                    *error = true;
+                    return msg;
+                };
+            }
 
             if (hdr_start_byte != 0xCD) {
                 ROS_ERROR("HDR : %i", hdr_start_byte);
