@@ -1,7 +1,7 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
-#define HEADER_READ_TIMEOUT 50
-#define BODY_READ_TIMEOUT 100
+#define HEADER_READ_TIMEOUT 200
+#define BODY_READ_TIMEOUT 1000
 
 #define RCV_BUFFER_SIZE 50
 
