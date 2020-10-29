@@ -41,13 +41,13 @@ namespace hoverboard_driver_node {
             };
 
             if (hoverboard_data[0] != 0xCD) {
-                ROS_ERROR("HDR DETECT");
+                ROS_ERROR("HDR : %i", hoverboard_data[0]);
                 *error = true;
                 return msg;
             };
 
             if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
-                ROS_ERROR("Body read");
+                ROS_ERROR("Body serial_read");
                 *error = true;
                 return msg;
             }
