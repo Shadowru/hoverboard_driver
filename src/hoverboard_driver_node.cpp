@@ -329,7 +329,7 @@ int main(int argc, char **argv) {
     ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
-    ros::Rate rate(50);  // 100 hz
+    ros::Rate rate(30);  // 100 hz
 
     std::string hoverboard_uart;
     int hoverboard_uart_baudrate;
@@ -370,7 +370,7 @@ int main(int argc, char **argv) {
 
         //command hoverboard
         if(counter++ > 5) {
-            //bool send_ok = hoverboard.resendCommand();
+            bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
 
