@@ -33,7 +33,7 @@ namespace hoverboard_driver_node {
                     hoverboard_data,
                     &hoverboard_data[0],
                     &hoverboard_data[RCV_BUFFER_SIZE - 1],
-                    ,0);
+                    0);
 
             hoverboard_driver::hoverboard_msg msg;
 
