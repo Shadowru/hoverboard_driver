@@ -15,19 +15,21 @@ namespace hoverboard_driver_node {
                 exit(1);
             }
 
+            flush_serial_recv_buffer(serial_);
+
             buffer_size = 50;
 
             serial_input_waiting(serial_, &buffer_size);
-
-            flush_serial_recv_buffer(serial_);
 
             last_steer = 0;
             last_speed = 0;
         }
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
+
             if (serial_read(serial_, hoverboard_data, 1, HEADER_READ_TIMEOUT) < 0) {
                 *error = true;
+                return NULL;
             };
 
             if (hoverboard_data[0] == 0xCD) {
@@ -115,7 +117,7 @@ namespace hoverboard_driver_node {
     private:
         std::string serial_name_;
         serial_t *serial_;
-        uint8_t hoverboard_data[30];
+        uint8_t hoverboard_data[50];
         int16_t last_steer;
         int16_t last_speed;
         //TODO : param
