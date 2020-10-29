@@ -150,6 +150,8 @@ float base_width;
 float wheel_radius;
 float wheel_circum;
 float rpm_per_meter;
+float encoder_cpm;
+double coeff;
 
 int right_pos = 0;
 int left_pos = 0;
@@ -159,6 +161,14 @@ ros::Time current_time, last_time;
 float global_x;
 float global_y;
 float global_theta;
+
+void initWheel(){
+    wheel_circum = 2.0 * wheel_radius * M_PI;
+
+    coeff = 2 * M_PI / encoder_cpr;
+
+    encoder_cpm = encoder_cpr / wheel_circum;
+}
 
 void setInstance(hoverboard_driver_node::Hoverboard *instance){
     hoverboard_instance = instance;
@@ -196,65 +206,96 @@ void velCallback(const geometry_msgs::Twist &vel) {
     hoverboard_instance->setSpeed(speed);
 }
 
+void sendOdometry(tf::TransformBroadcaster odom_broadcaster, ros::Publisher odometry_pub){
+
+    //since all odometry is 6DOF we'll need a quaternion created from yaw
+    geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(robot_angular_pos);
+
+    //first, we'll publish the transform over tf
+    geometry_msgs::TransformStamped odom_trans;
+    odom_trans.header.stamp = current_time;
+    odom_trans.header.frame_id = odom_frame;
+    odom_trans.child_frame_id = base_frame;
+
+    odom_trans.transform.translation.x = robot_x_pos;
+    odom_trans.transform.translation.y = robot_y_pos;
+    odom_trans.transform.translation.z = 0.0;
+    odom_trans.transform.rotation = odom_quat;
+
+    //send the transform
+    odom_broadcaster.sendTransform(odom_trans);
+
+    //next, we'll publish the odometry message over ROS
+    nav_msgs::Odometry odom;
+    odom.header.stamp = current_time;
+    odom.header.frame_id = odom_frame;
+
+    //set the position
+    odom.pose.pose.position.x = robot_x_pos;
+    odom.pose.pose.position.y = robot_y_pos;
+    odom.pose.pose.position.z = 0.0;
+    odom.pose.pose.orientation = odom_quat;
+
+    odom.pose.covariance[0] = ODOM_COV;
+    odom.pose.covariance[7] = ODOM_COV;
+    odom.pose.covariance[14] = ODOM_COV;
+    odom.pose.covariance[21] = ODOM_COV;
+    odom.pose.covariance[28] = ODOM_COV;
+    odom.pose.covariance[35] = ODOM_COV;
+
+    //set the velocity
+    odom.child_frame_id = base_frame;
+    odom.twist.twist.linear.x = robot_x_vel;
+    odom.twist.twist.linear.y = robot_y_vel;
+    odom.twist.twist.angular.z = robot_angular_vel;
+
+    //publish the message
+    odometry_pub.publish(odom);
+}
+
 void publishOdometry(ros::Publisher odometry_pub,
                       hoverboard_driver::hoverboard_msg feedback,
                       tf::TransformBroadcaster odom_broadcaster,
                       const ros::Time current_time,
                       const ros::Time last_time) {
-    ros::Duration ros_time_elapsed = current_time - last_time;
-    float time_elapsed = ros_time_elapsed.toSec();
 
-    // Forward
-    // speedR_meas - negative
-    // speedL_meas - positive
-    int current_feedback_left = feedback.speedL_meas;
-    int current_feedback_right = -1 * feedback.speedR_meas;
+    double curr_wheel_L_ang_pos = getAngularPos(LEFT_AXIS);
+    double curr_wheel_R_ang_pos = getAngularPos(RIGHT_AXIS);
+    double dtime = (current_time - last_time).toSec();
 
-    //Assume feedback is rpm
-    //rpm to meters
-    float current_rps_left = current_feedback_left / 60.0;
-    float current_rps_right = current_feedback_right / 60.0;
+    double delta_L_ang_pos = curr_wheel_L_ang_pos - raw_wheel_L_ang_pos;
+    double delta_R_ang_pos = -1.0 * (curr_wheel_R_ang_pos - raw_wheel_R_ang_pos);
 
-    float delta_right_wheel_in_meter = current_rps_left * time_elapsed;
-    float delta_left_wheel_in_meter = current_rps_right * time_elapsed;
+    delta_L_ang_pos = delta_L_ang_pos;
+    delta_R_ang_pos = delta_R_ang_pos;
 
-    float local_theta = (delta_right_wheel_in_meter - delta_left_wheel_in_meter) / base_width;
+    raw_wheel_L_ang_pos = curr_wheel_L_ang_pos;
+    raw_wheel_R_ang_pos = curr_wheel_R_ang_pos;
 
-    float distance = (delta_right_wheel_in_meter + delta_left_wheel_in_meter) / 2;
+    wheel_L_ang_vel = delta_L_ang_pos / (dtime);
+    wheel_R_ang_vel = delta_R_ang_pos / (dtime);
 
-    float local_x = cos(global_theta) * distance;
-    float local_y = -sin(global_theta) * distance;
+    wheel_L_ang_pos = wheel_L_ang_pos + delta_L_ang_pos;
+    wheel_R_ang_pos = wheel_R_ang_pos + delta_R_ang_pos;
 
-    global_x = global_x + (cos(global_theta) * local_x - sin(global_theta) * local_y);
-    global_y = global_y + (sin(global_theta) * local_x + cos(global_theta) * local_y);
 
-    global_theta += local_theta;
+    robot_angular_vel = (((wheel_R_ang_pos - wheel_L_ang_pos) * wheel_radius / base_width) - robot_angular_pos) / dtime;
+    robot_angular_pos = (wheel_R_ang_pos - wheel_L_ang_pos) * wheel_radius / base_width;
 
-    //global_theta = math.atan2(math.sin(global_theta), math.cos(global_theta));
+    robot_x_vel = ((wheel_L_ang_vel * wheel_radius + robot_angular_vel * (base_width / 2.0)) * cos(robot_angular_pos));
+    robot_y_vel = ((wheel_L_ang_vel * wheel_radius + robot_angular_vel * (base_width / 2.0)) * sin(robot_angular_pos));
 
-    tf::Quaternion quaternion;
-    quaternion.setRPY(0, 0, global_theta);
+    robot_x_pos = robot_x_pos + robot_x_vel * dtime;
+    robot_y_pos = robot_y_pos + robot_y_vel * dtime;
 
-    ros::Time now_time = ros::Time::now();
+    // send odometry
+    sendOdometry(odom_broadcaster, odometry_pub);
 
-    tf::Transform transform;
-    transform.setOrigin(tf::Vector3(global_x, global_y, 0.0));
-    transform.setRotation(quaternion);
+    pos[0] = wheel_L_ang_pos;
+    pos[1] = wheel_R_ang_pos;
 
-    odom_broadcaster.sendTransform(tf::StampedTransform(transform, ros::Time::now(), "base_link", "odom"));
-
-    nav_msgs::Odometry odom;
-    odom.header.stamp = now_time;
-    odom.header.frame_id = "odom";
-    odom.pose.pose.position.x = global_x;
-    odom.pose.pose.position.y = global_y;
-    odom.pose.pose.position.z = 0;
-    odom.pose.pose.orientation = tf::createQuaternionMsgFromYaw(global_theta);
-    odom.child_frame_id = "base_link";
-    odom.twist.twist.linear.x = distance / time_elapsed;
-    odom.twist.twist.linear.y = 0;
-    odom.twist.twist.angular.z = local_theta / time_elapsed;
-    odometry_pub.publish(odom);
+    vel[0] = wheel_L_ang_vel;
+    vel[1] = wheel_R_ang_vel;
 
 
 }
@@ -284,11 +325,7 @@ int main(int argc, char **argv) {
     node.param<float>("base_width", base_width, 0.43);
     node.param<float>("wheel_radius", wheel_radius, 0.235 / 2);
 
-    wheel_circum = 2.0 * wheel_radius * M_PI;
-
-    rpm_per_meter = 1 / wheel_circum;
-
-    ROS_INFO("rpm_per_meter : %f", rpm_per_meter);
+    initWheel();
 
     current_time = ros::Time::now();
     last_time = ros::Time::now();
