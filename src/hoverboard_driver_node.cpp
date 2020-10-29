@@ -44,6 +44,9 @@ namespace hoverboard_driver_node {
                     *error = true;
                     return msg;
                 }
+            } else {
+                *error = true;
+                return msg;
             }
 
             int idx = 1;
