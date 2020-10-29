@@ -42,7 +42,7 @@ namespace hoverboard_driver_node {
 
             while(hdr_start_byte != 0xCD && cnt++ < 5) {
                 if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
-                    ROS_ERROR("serial_read");
+                    ROS_ERROR("HDR serial_read");
                     *error = true;
                     return msg;
                 };
