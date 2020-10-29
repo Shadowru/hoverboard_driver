@@ -31,7 +31,7 @@ namespace hoverboard_driver_node {
 
             //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
             //hoverboard_data[0] = 0xFF;
-            uint8_t hdr_start_byte = 0xFF;
+
 
             hoverboard_driver::hoverboard_msg msg;
 
@@ -133,6 +133,7 @@ namespace hoverboard_driver_node {
         uint8_t hoverboard_data[RCV_BUFFER_SIZE];
         int16_t last_steer;
         int16_t last_speed;
+        uint8_t hdr_start_byte = 0xFF;
         //TODO : param
         unsigned int buffer_size;
     };
