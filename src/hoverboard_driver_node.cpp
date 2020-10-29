@@ -35,7 +35,7 @@ namespace hoverboard_driver_node {
 
             hoverboard_driver::hoverboard_msg msg;
 
-            if (serial_read(serial_, hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
+            if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                 ROS_ERROR("serial_read");
                 *error = true;
                 return msg;
