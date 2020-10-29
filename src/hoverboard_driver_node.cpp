@@ -271,7 +271,7 @@ int main(int argc, char **argv) {
     int hoverboard_uart_baudrate;
 
     node.param<std::string>("uart", hoverboard_uart, "/dev/ttyTHS1");
-    node.param<int>("baudrate", hoverboard_uart_baudrate, "115200");
+    node.param("baudrate", hoverboard_uart_baudrate, "115200");
 
     hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart, hoverboard_uart_baudrate);
 
