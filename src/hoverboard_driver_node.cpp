@@ -162,8 +162,8 @@ int encoder_cpr = 90;
 ros::Time current_time, last_time;
 
 //TODO: Odometry class
-double raw_wheel_L_ang_pos;
-double raw_wheel_R_ang_pos;
+double raw_wheel_L_ang_pos = std::numeric_limits<double>::max();
+double raw_wheel_R_ang_pos = std::numeric_limits<double>::max();
 
 double wheel_L_ang_vel;
 double wheel_R_ang_vel;
@@ -187,6 +187,10 @@ void initWheel(){
     coeff = 2 * M_PI / encoder_cpr;
 
     encoder_cpm = encoder_cpr / wheel_circum;
+
+    rpm_per_meter = 1 / wheel_circum;
+
+    ROS_INFO("rpm_per_meter : %f", rpm_per_meter);
 }
 
 double getAngularPos(float pulse){
@@ -209,7 +213,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
     float rps = v / rpm_per_meter;
 
     //So it's rpm - rotate per minute
-    float rpm = rps * 60;
+    float rpm = rps * 60 * 5;
 
     if(rpm > 0.0 && rpm < 1.0){
         rpm = 1;
@@ -220,7 +224,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
-    int16_t steer = static_cast<int>(-1 * w * 50);
+    int16_t steer = static_cast<int>(-1 * w * 5);
 
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
@@ -349,6 +353,7 @@ int main(int argc, char **argv) {
     node.param("encoder_cpr", encoder_cpr, 90);
 
     initWheel();
+    initOdometry(hoverboard);
 
     current_time = ros::Time::now();
     last_time = ros::Time::now();
