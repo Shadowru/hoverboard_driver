@@ -42,7 +42,7 @@ namespace hoverboard_driver_node {
                 return msg;
             };
 
-            if (hdr_start_byte[0] != 0xCD) {
+            if (hdr_start_byte != 0xCD) {
                 ROS_ERROR("HDR : %i", hdr_start_byte);
                 *error = true;
                 return msg;
