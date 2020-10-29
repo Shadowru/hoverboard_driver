@@ -35,18 +35,21 @@ namespace hoverboard_driver_node {
             hoverboard_driver::hoverboard_msg msg;
 
             if (serial_read(serial_, hoverboard_data, 1, HEADER_READ_TIMEOUT) < 0) {
+                ROS_ERROR("serial_read");
                 *error = true;
                 return msg;
             };
 
             if (hoverboard_data[0] != 0xCD) {
+                ROS_ERROR("HDR DETECT");
                 *error = true;
                 return msg;
             };
 
             if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
-                    *error = true;
-                    return msg;
+                ROS_ERROR("Body read");
+                *error = true;
+                return msg;
             }
 
             int idx = 1;
