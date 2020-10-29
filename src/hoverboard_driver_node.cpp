@@ -189,6 +189,10 @@ void initWheel(){
     encoder_cpm = encoder_cpr / wheel_circum;
 }
 
+double getAngularPos(float pulse){
+    return coeff * pulse;
+}
+
 void setInstance(hoverboard_driver_node::Hoverboard *instance){
     hoverboard_instance = instance;
 }
@@ -278,8 +282,8 @@ void publishOdometry(ros::Publisher odometry_pub,
                       const ros::Time current_time,
                       const ros::Time last_time) {
 
-    double curr_wheel_L_ang_pos = getAngularPos(LEFT_AXIS);
-    double curr_wheel_R_ang_pos = getAngularPos(RIGHT_AXIS);
+    double curr_wheel_L_ang_pos = getAngularPos((double)feedback.pulseCountL);
+    double curr_wheel_R_ang_pos = getAngularPos((double)feedback.pulseCountL);
     double dtime = (current_time - last_time).toSec();
 
     double delta_L_ang_pos = curr_wheel_L_ang_pos - raw_wheel_L_ang_pos;
