@@ -1,7 +1,7 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
-#define HEADER_READ_TIMEOUT 200
-#define BODY_READ_TIMEOUT 1000
+#define HEADER_READ_TIMEOUT 10
+#define BODY_READ_TIMEOUT 300
 
 #define RCV_BUFFER_SIZE 50
 
@@ -32,19 +32,18 @@ namespace hoverboard_driver_node {
             //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
             //hoverboard_data[0] = 0xFF;
 
-            uint8_t hdr_start_byte[1];
-            hdr_start_byte[0] = 0xFF;
+            uint8_t hdr_start_byte = 0xFF;
 
             hoverboard_driver::hoverboard_msg msg;
 
-            if (serial_read(serial_, hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
+            if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                 ROS_ERROR("serial_read");
                 *error = true;
                 return msg;
             };
 
             if (hdr_start_byte[0] != 0xCD) {
-                ROS_ERROR("HDR : %i", hdr_start_byte[0]);
+                ROS_ERROR("HDR : %i", hdr_start_byte);
                 *error = true;
                 return msg;
             };
