@@ -9,10 +9,10 @@ namespace hoverboard_driver_node {
 
     class Hoverboard {
     public:
-        Hoverboard(std::string serial_name) : serial_name_(serial_name) {
+        Hoverboard(std::string serial_name, int baud_rate) : serial_name_(serial_name) {
             serial_ = serial_new();
 
-            if (serial_open(serial_, serial_name.c_str(), 115200) < 0) {
+            if (serial_open(serial_, serial_name.c_str(), baud_rate) < 0) {
                 ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
                 exit(1);
             }
@@ -268,10 +268,12 @@ int main(int argc, char **argv) {
     ros::Rate rate(100);  // 100 hz
 
     std::string hoverboard_uart;
+    int hoverboard_uart_baudrate;
 
-    node.param<std::string>("hoverboard_uart", hoverboard_uart, "/dev/ttyTHS1");
+    node.param<std::string>("uart", hoverboard_uart, "/dev/ttyTHS1");
+    node.param<int>("baudrate", hoverboard_uart_baudrate, "115200");
 
-    hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart);
+    hoverboard_driver_node::Hoverboard hoverboard(hoverboard_uart, hoverboard_uart_baudrate);
 
     setInstance(&hoverboard);
 
