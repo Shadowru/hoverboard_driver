@@ -3,7 +3,7 @@
 #define HEADER_READ_TIMEOUT 10
 #define BODY_READ_TIMEOUT 50
 
-#define RCV_BUFFER_SIZE 30
+#define RCV_BUFFER_SIZE 50
 
 namespace hoverboard_driver_node {
 
@@ -29,8 +29,8 @@ namespace hoverboard_driver_node {
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
 
-
-            std::memset(hoverboard_data, 0, sizeof hoverboard_data);
+            //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
+            hoverboard_data[0] = 0xFF;
 
             hoverboard_driver::hoverboard_msg msg;
 
@@ -39,14 +39,14 @@ namespace hoverboard_driver_node {
                 return msg;
             };
 
-            if (hoverboard_data[0] == 0xCD) {
-                if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
-                    *error = true;
-                    return msg;
-                }
-            } else {
+            if (hoverboard_data[0] != 0xCD) {
                 *error = true;
                 return msg;
+            };
+
+            if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
+                    *error = true;
+                    return msg;
             }
 
             int idx = 1;
