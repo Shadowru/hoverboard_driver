@@ -32,7 +32,7 @@ namespace hoverboard_driver_node {
             //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
             //hoverboard_data[0] = 0xFF;
 
-            uint8_t hdr_start_byte = [1];
+            uint8_t hdr_start_byte[1];
             hdr_start_byte[0] = 0xFF;
 
             hoverboard_driver::hoverboard_msg msg;
