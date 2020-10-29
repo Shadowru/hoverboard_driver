@@ -146,6 +146,8 @@ namespace hoverboard_driver_node {
 
 hoverboard_driver_node::Hoverboard *hoverboard_instance = NULL;
 
+std::string odom_frame, base_frame;
+
 float base_width;
 float wheel_radius;
 float wheel_circum;
@@ -329,6 +331,9 @@ int main(int argc, char **argv) {
 
     std::string hoverboard_uart;
     int hoverboard_uart_baudrate;
+
+    nh.param<std::string>("odom_frame", odom_frame, "odom");
+    nh.param<std::string>("base_frame", base_frame, "base_link");
 
     node.param<std::string>("uart", hoverboard_uart, "/dev/ttyTHS1");
     node.param("baudrate", hoverboard_uart_baudrate, 115200);
