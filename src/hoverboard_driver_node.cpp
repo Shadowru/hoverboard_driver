@@ -5,6 +5,8 @@
 
 #define RCV_BUFFER_SIZE 50
 
+#define ODOM_COV 0.005
+
 namespace hoverboard_driver_node {
 
     class Hoverboard {
@@ -308,13 +310,6 @@ void publishOdometry(ros::Publisher odometry_pub,
     // send odometry
     sendOdometry(odom_broadcaster, odometry_pub);
 
-    pos[0] = wheel_L_ang_pos;
-    pos[1] = wheel_R_ang_pos;
-
-    vel[0] = wheel_L_ang_vel;
-    vel[1] = wheel_R_ang_vel;
-
-
 }
 
 void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg) {
@@ -327,13 +322,13 @@ int main(int argc, char **argv) {
     ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
-    ros::Rate rate(100);  // 100 hz
+    ros::Rate rate(50);  // 100 hz
 
     std::string hoverboard_uart;
     int hoverboard_uart_baudrate;
 
-    nh.param<std::string>("odom_frame", odom_frame, "odom");
-    nh.param<std::string>("base_frame", base_frame, "base_link");
+    node.param<std::string>("odom_frame", odom_frame, "odom");
+    node.param<std::string>("base_frame", base_frame, "base_link");
 
     node.param<std::string>("uart", hoverboard_uart, "/dev/ttyTHS1");
     node.param("baudrate", hoverboard_uart_baudrate, 115200);
