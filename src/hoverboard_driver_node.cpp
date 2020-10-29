@@ -29,11 +29,8 @@ namespace hoverboard_driver_node {
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
 
-            std::fill(
-                    hoverboard_data,
-                    &hoverboard_data[0],
-                    &hoverboard_data[RCV_BUFFER_SIZE - 1],
-                    0);
+
+            std::memset(hoverboard_data, 0, sizeof hoverboard_data);
 
             hoverboard_driver::hoverboard_msg msg;
 
