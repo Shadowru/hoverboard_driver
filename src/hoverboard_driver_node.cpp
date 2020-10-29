@@ -55,7 +55,7 @@ namespace hoverboard_driver_node {
             };
 
             if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
-                ROS_ERROR("Body serial_read");
+                ROS_ERROR("BODY serial_read");
                 *error = true;
                 return msg;
             }
