@@ -343,8 +343,7 @@ int main(int argc, char **argv) {
 
     node.param<float>("base_width", base_width, 0.43);
     node.param<float>("wheel_radius", wheel_radius, 0.235 / 2);
-    nh.param("encoder_cpr", encoder_cpr, 90);
-
+    node.param("encoder_cpr", encoder_cpr, 90);
 
     initWheel();
 
