@@ -1,5 +1,8 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
+#define HEADER_READ_TIMEOUT 10
+#define BODY_READ_TIMEOUT 50
+
 namespace hoverboard_driver_node {
 
     class Hoverboard {
@@ -7,7 +10,7 @@ namespace hoverboard_driver_node {
         Hoverboard(std::string serial_name) : serial_name_(serial_name) {
             serial_ = serial_new();
 
-            if (serial_open(serial_, serial_name.c_str(), 38400) < 0) {
+            if (serial_open(serial_, serial_name.c_str(), 115200) < 0) {
                 ROS_ERROR("serial_open(): %s\n", serial_errmsg(serial_));
                 exit(1);
             }
@@ -21,12 +24,12 @@ namespace hoverboard_driver_node {
         }
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
-            if (serial_read(serial_, hoverboard_data, 1, 20) < 0) {
+            if (serial_read(serial_, hoverboard_data, 1, HEADER_READ_TIMEOUT) < 0) {
                 *error = true;
             };
 
             if (hoverboard_data[0] == 0xCD) {
-                if (serial_read(serial_, hoverboard_data, 21, 100) < 0) {
+                if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
                     *error = true;
                 }
             }
@@ -35,17 +38,21 @@ namespace hoverboard_driver_node {
 
             int idx = 1;
 
-            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmd1;
-            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmd2;
-            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.speedR_meas;
-            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.speedL_meas;
-            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.errorR;
-            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.errorL;
-            msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.batVoltage;
-            msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.boardTemp;
-            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);//feedback.cmdLed;
+            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
 
-            uint16_t msg_checksum = hoverboard_data[19] + (hoverboard_data[20]<< 8);
+            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+
+            msg.pulseCountR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8) + (hoverboard_data[idx++]<< 16) + (hoverboard_data[idx++]<< 24);
+            msg.pulseCountL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8) + (hoverboard_data[idx++]<< 16) + (hoverboard_data[idx++]<< 24);
+
+            uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
 
             uint16_t calc_checksum = 0xABCD ^ msg.cmd1 ^ msg.cmd2 ^ msg.speedR_meas ^ msg.speedL_meas ^ msg.batVoltage ^ msg.boardTemp ^ msg.cmdLed;
 
