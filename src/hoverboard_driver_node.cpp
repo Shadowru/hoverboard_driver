@@ -32,17 +32,19 @@ namespace hoverboard_driver_node {
             //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
             //hoverboard_data[0] = 0xFF;
 
+            uint8_t hdr_start_byte = [1];
+            hdr_start_byte[0] = 0xFF;
 
             hoverboard_driver::hoverboard_msg msg;
 
-            if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
+            if (serial_read(serial_, hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                 ROS_ERROR("serial_read");
                 *error = true;
                 return msg;
             };
 
-            if (hdr_start_byte != 0xCD) {
-                ROS_ERROR("HDR : %i", hdr_start_byte);
+            if (hdr_start_byte[0] != 0xCD) {
+                ROS_ERROR("HDR : %i", hdr_start_byte[0]);
                 *error = true;
                 return msg;
             };
@@ -133,7 +135,6 @@ namespace hoverboard_driver_node {
         uint8_t hoverboard_data[RCV_BUFFER_SIZE];
         int16_t last_steer;
         int16_t last_speed;
-        uint8_t hdr_start_byte = 0xFF;
         //TODO : param
         unsigned int buffer_size;
     };
