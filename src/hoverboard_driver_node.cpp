@@ -286,7 +286,7 @@ int main(int argc, char **argv) {
 
         //command hoverboard
         if(counter++ > 5) {
-            bool send_ok = hoverboard.resendCommand();
+            //bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
 
