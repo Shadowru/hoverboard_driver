@@ -289,6 +289,13 @@ void publishOdometry(ros::Publisher odometry_pub,
     double curr_wheel_L_ang_pos = getAngularPos((double)feedback.pulseCountL);
     double curr_wheel_R_ang_pos = getAngularPos((double)feedback.pulseCountR);
 
+    //TODO: fix mess
+    if(raw_wheel_L_ang_pos == std::numeric_limits<double>::max() && raw_wheel_R_ang_pos == std::numeric_limits<double>::max()){
+        raw_wheel_L_ang_pos = curr_wheel_L_ang_pos;
+        raw_wheel_R_ang_pos = curr_wheel_R_ang_pos;
+        return;
+    }
+
     //ROS_INFO("L ang : %f, R ang : %f", curr_wheel_L_ang_pos, curr_wheel_R_ang_pos);
 
     double dtime = (current_time - last_time).toSec();
@@ -353,7 +360,6 @@ int main(int argc, char **argv) {
     node.param("encoder_cpr", encoder_cpr, 90);
 
     initWheel();
-    initOdometry(hoverboard);
 
     current_time = ros::Time::now();
     last_time = ros::Time::now();
