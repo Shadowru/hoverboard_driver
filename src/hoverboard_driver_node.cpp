@@ -153,10 +153,25 @@ float rpm_per_meter;
 float encoder_cpm;
 double coeff;
 
-int right_pos = 0;
-int left_pos = 0;
+int encoder_cpr = 90;
 
 ros::Time current_time, last_time;
+
+//TODO: Odometry class
+double raw_wheel_L_ang_pos;
+double raw_wheel_R_ang_pos;
+
+double wheel_L_ang_vel;
+double wheel_R_ang_vel;
+double wheel_L_ang_pos;
+double wheel_R_ang_pos;
+double robot_angular_vel;
+double robot_angular_pos;
+double robot_x_vel;
+double robot_y_vel;
+double robot_x_pos;
+double robot_y_pos;
+
 
 float global_x;
 float global_y;
@@ -324,6 +339,8 @@ int main(int argc, char **argv) {
 
     node.param<float>("base_width", base_width, 0.43);
     node.param<float>("wheel_radius", wheel_radius, 0.235 / 2);
+    nh.param("encoder_cpr", encoder_cpr, 90);
+
 
     initWheel();
 
