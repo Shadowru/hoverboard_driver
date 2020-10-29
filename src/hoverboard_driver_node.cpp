@@ -1,7 +1,7 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
-#define HEADER_READ_TIMEOUT 10
-#define BODY_READ_TIMEOUT 50
+#define HEADER_READ_TIMEOUT 50
+#define BODY_READ_TIMEOUT 100
 
 #define RCV_BUFFER_SIZE 50
 
@@ -293,7 +293,7 @@ int main(int argc, char **argv) {
 
     tf::TransformBroadcaster odom_broadcaster;
 
-    bool hoverboard_error = false;
+    bool read_hoverboard_error = false;
 
     //TODO: replace with rate
     int counter = 0;
@@ -306,11 +306,9 @@ int main(int argc, char **argv) {
             counter = 0;
         }
 
-        hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&hoverboard_error);
+        hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&read_hoverboard_error);
 
-        if (hoverboard_error) {
-            ROS_ERROR("Can't connect to hoverboard!");
-        } else {
+        if (!read_hoverboard_error) {
             publishMessage(hoverboard_pub, feedback);
             //publishOdometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
         }
