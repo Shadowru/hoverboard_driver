@@ -19,9 +19,7 @@ namespace hoverboard_driver_node {
 
             //serial_input_waiting(serial_, &buffer_size);
 
-            usleep(1000);
-            ioctl(serial_->fd, TCFLSH, 0); // flush receive
-
+            flush_serial_recv_buffer(serial_);
 
             last_steer = 0;
             last_speed = 0;

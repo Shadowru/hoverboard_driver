@@ -71,6 +71,7 @@ int serial_set_vtime(serial_t *serial, float vtime);
 /* Miscellaneous */
 int serial_fd(serial_t *serial);
 int serial_tostring(serial_t *serial, char *str, size_t len);
+void flush_serial_recv_buffer(serial_t *serial);
 
 /* Error Handling */
 int serial_errno(serial_t *serial);
