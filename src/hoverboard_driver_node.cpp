@@ -30,17 +30,18 @@ namespace hoverboard_driver_node {
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
 
             //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
-            hoverboard_data[0] = 0xFF;
+            //hoverboard_data[0] = 0xFF;
+            uint8_t hdr_start_byte = 0xFF:
 
             hoverboard_driver::hoverboard_msg msg;
 
-            if (serial_read(serial_, hoverboard_data, 1, HEADER_READ_TIMEOUT) < 0) {
+            if (serial_read(serial_, hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                 ROS_ERROR("serial_read");
                 *error = true;
                 return msg;
             };
 
-            if (hoverboard_data[0] != 0xCD) {
+            if (hdr_start_byte != 0xCD) {
                 ROS_ERROR("HDR : %i", hoverboard_data[0]);
                 *error = true;
                 return msg;
