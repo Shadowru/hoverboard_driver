@@ -249,7 +249,7 @@ int main(int argc, char **argv) {
     ROS_INFO("Starting hoverboard_driver node");
     ros::init(argc, argv, "hoverboard_driver");
     ros::NodeHandle node;
-    ros::Rate rate(50);  // 100 hz
+    ros::Rate rate(10);  // 100 hz
 
     std::string hoverboard_uart;
 
