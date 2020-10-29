@@ -375,7 +375,7 @@ int main(int argc, char **argv) {
 
         if (!read_hoverboard_error) {
             publishMessage(hoverboard_pub, feedback);
-            //publishOdometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
+            publishOdometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
         }
 
         ros::spinOnce();
