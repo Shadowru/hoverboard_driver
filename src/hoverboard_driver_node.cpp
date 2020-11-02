@@ -1,6 +1,6 @@
 #include "hoverboard_driver/hoverboard_driver.h"
 
-#define HEADER_READ_TIMEOUT 10
+#define HEADER_READ_TIMEOUT 1
 #define BODY_READ_TIMEOUT 300
 
 #define RCV_BUFFER_SIZE 50
@@ -42,7 +42,7 @@ namespace hoverboard_driver_node {
 
             int cnt = 0;
 
-            while(hdr_start_byte != 0xCD && cnt++ < 5) {
+            while(hdr_start_byte != 0xCD && cnt++ < 29) {
                 if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                     ROS_ERROR("HDR serial_read");
                     *error = true;
