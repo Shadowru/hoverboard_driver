@@ -196,7 +196,7 @@ void initWheel(){
 }
 
 double getAngularPos(float pulse){
-    return coeff * pulse;
+    return -1 * coeff * pulse;
 }
 
 void setInstance(hoverboard_driver_node::Hoverboard *instance){
