@@ -298,7 +298,7 @@ void publishOdometry(ros::Publisher odometry_pub,
         return;
     }
 
-    ROS_INFO("L ang : %f, R ang : %f", curr_wheel_L_ang_pos, curr_wheel_R_ang_pos);
+    //ROS_INFO("L ang : %f, R ang : %f", curr_wheel_L_ang_pos, curr_wheel_R_ang_pos);
 
     double dtime = (current_time - last_time).toSec();
 
