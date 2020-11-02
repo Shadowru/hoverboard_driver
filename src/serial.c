@@ -67,7 +67,7 @@ void serial_free(serial_t *serial) {
 }
 
 void flush_serial_recv_buffer(serial_t *serial) {
-    usleep(1000);
+    //usleep(1000);
     ioctl(serial->fd, TCFLSH, 0); // flush receive
 }
 
