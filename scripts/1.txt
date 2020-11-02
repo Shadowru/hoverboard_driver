@@ -13,6 +13,9 @@ rostopic hz /hoverboard_msg
 
 rostopic echo /odometry
 
+rosrun teleop_twist_keyboard teleop_twist_keyboard.py
+rosrun teleop_twist_joy teleop_node
+
 rostopic pub /cmd_vel geometry_msgs/Twist -- '[0.5,0.0,0.0]' '[0.0, 0.0, 0.0]'
 
 rostopic pub /cmd_vel geometry_msgs/Twist -- '[0.0,0.0,0.0]' '[0.0, 0.0, 0.3]'
@@ -25,10 +28,6 @@ angular:
   x: 0.0
   y: 0.0
   z: 0.3" -r 3
-
-
-rosrun teleop_twist_keyboard teleop_twist_keyboard.py
-rosrun teleop_twist_joy teleop_node
 
 
 speed = 30

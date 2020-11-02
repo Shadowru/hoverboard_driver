@@ -215,7 +215,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
     float rps = v / rpm_per_meter;
 
     //So it's rpm - rotate per minute
-    float rpm = rps * 60 * 5;
+    float rpm = rps * 60;
 
     if(rpm > 0.0 && rpm < 1.0){
         rpm = 1;
@@ -226,7 +226,7 @@ void velCallback(const geometry_msgs::Twist &vel) {
 
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
-    int16_t steer = static_cast<int>(-1 * w * 5);
+    int16_t steer = static_cast<int>(-1 * w * 25);
 
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
