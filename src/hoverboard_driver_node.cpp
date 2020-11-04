@@ -332,7 +332,7 @@ void publishOdometry(hoverboard_driver::hoverboard_msg feedback,
 
 }
 
-void publishMessage(ros::Publisher odrive_pub, hoverboard_driver::hoverboard_msg msg) {
+void publishMessage(const ros::Publisher& odrive_pub, hoverboard_driver::hoverboard_msg msg) {
     // Publish message
     odrive_pub.publish(msg);
 }
