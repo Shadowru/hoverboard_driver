@@ -1,11 +1,17 @@
-#include "hoverboard_driver/hoverboard_driver.h"
+#include <utility>
 
-#define HEADER_READ_TIMEOUT 1
-#define BODY_READ_TIMEOUT 300
+#include "hoverboard_driver/hoverboard_driver.h"
 
 #define RCV_BUFFER_SIZE 50
 
 #define ODOM_COV 0.005
+
+#define FULL_HEADER 0xABCD
+#define HEADER_START 0xCD
+#define HEADER_READ_TIMEOUT 1
+#define BODY_READ_TIMEOUT 300
+#define PACKET_SIZE 29
+
 
 namespace hoverboard_driver_node {
 
@@ -19,20 +25,11 @@ namespace hoverboard_driver_node {
                 exit(1);
             }
 
-            //flush_serial_recv_buffer(serial_);
-
-            //buffer_size = 50;
-
-            //serial_input_waiting(serial_, &buffer_size);
-
             last_steer = 0;
             last_speed = 0;
         }
 
         hoverboard_driver::hoverboard_msg read_data(bool *error) {
-
-            //std::memset(hoverboard_data, 0, sizeof hoverboard_data);
-            //hoverboard_data[0] = 0xFF;
 
             flush_serial_recv_buffer(serial_);
 
@@ -42,7 +39,7 @@ namespace hoverboard_driver_node {
 
             int cnt = 0;
 
-            while(hdr_start_byte != 0xCD && cnt++ < 29) {
+            while (hdr_start_byte != HEADER_START && cnt++ < (PACKET_SIZE - 1)) {
                 if (serial_read(serial_, &hdr_start_byte, 1, HEADER_READ_TIMEOUT) < 0) {
                     ROS_ERROR("HDR serial_read");
                     *error = true;
@@ -50,13 +47,13 @@ namespace hoverboard_driver_node {
                 };
             }
 
-            if (hdr_start_byte != 0xCD) {
-                ROS_ERROR("HDR : %i", hdr_start_byte);
+            if (hdr_start_byte != HEADER_START) {
+                ROS_ERROR("HDR read erorr : %i", hdr_start_byte);
                 *error = true;
                 return msg;
             };
 
-            if (serial_read(serial_, hoverboard_data, 29, BODY_READ_TIMEOUT) < 0) {
+            if (serial_read(serial_, hoverboard_data, PACKET_SIZE, BODY_READ_TIMEOUT) < 0) {
                 ROS_ERROR("BODY serial_read");
                 *error = true;
                 return msg;
@@ -64,25 +61,29 @@ namespace hoverboard_driver_node {
 
             int idx = 1;
 
-            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
-            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
-            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
-            msg.pulseCountR = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8) + (hoverboard_data[idx++]<< 16) + (hoverboard_data[idx++]<< 24);
-            msg.pulseCountL = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8) + (hoverboard_data[idx++]<< 16) + (hoverboard_data[idx++]<< 24);
+            msg.pulseCountR = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
+                              (hoverboard_data[idx++] << 24);
+            msg.pulseCountL = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
+                              (hoverboard_data[idx++] << 24);
 
-            uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++]<< 8);
+            uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
-            uint16_t calc_checksum = 0xABCD ^ msg.cmd1 ^ msg.cmd2 ^ msg.speedR_meas ^ msg.speedL_meas ^ msg.batVoltage ^ msg.boardTemp ^ msg.cmdLed;
+            uint16_t calc_checksum =
+                    0xABCD ^msg.cmd1 ^msg.cmd2 ^msg.speedR_meas ^msg.speedL_meas ^msg.batVoltage ^msg.boardTemp ^
+                    msg.cmdLed;
 
-            if(msg_checksum != calc_checksum){
+            if (msg_checksum != calc_checksum) {
                 ROS_ERROR("Checksum wrong!: ");
                 *error = true;
             } else {
@@ -92,24 +93,27 @@ namespace hoverboard_driver_node {
             return msg;
         };
 
-        bool sendCommand(int16_t steer, int16_t speed){
+        bool sendCommand(int16_t steer, int16_t speed) {
 
             //ROS_DEBUG("Send command : %d - %d", steer, speed);
 
             uint8_t hoverboard_command[8];
-            uint16_t start = 0xABCD;
-            uint16_t checksum = start ^ steer ^ speed;
-            int idx = 0;
-            hoverboard_command[idx++]= start & 0xff;
-            hoverboard_command[idx++]=(start >> 8);
-            hoverboard_command[idx++]= steer & 0xff;
-            hoverboard_command[idx++]=(steer >> 8);
-            hoverboard_command[idx++]= speed & 0xff;
-            hoverboard_command[idx++]=(speed >> 8);
-            hoverboard_command[idx++]= checksum & 0xff;
-            hoverboard_command[idx++]=(checksum >> 8);
 
-            if(serial_write(serial_, hoverboard_command, 8) < 0){
+            uint16_t checksum = FULL_HEADER ^steer ^speed;
+            int idx = 0;
+            hoverboard_command[idx++] = FULL_HEADER & 0xff;
+            hoverboard_command[idx++] = (FULL_HEADER >> 8);
+
+            hoverboard_command[idx++] = steer & 0xff;
+            hoverboard_command[idx++] = (steer >> 8);
+
+            hoverboard_command[idx++] = speed & 0xff;
+            hoverboard_command[idx++] = (speed >> 8);
+
+            hoverboard_command[idx++] = checksum & 0xff;
+            hoverboard_command[idx++] = (checksum >> 8);
+
+            if (serial_write(serial_, hoverboard_command, 8) < 0) {
                 ROS_ERROR("Write command error!");
                 return false;
             };
@@ -119,15 +123,15 @@ namespace hoverboard_driver_node {
             return true;
         };
 
-        bool setSteer(int16_t steer){
+        bool setSteer(int16_t steer) {
             last_steer = steer;
         };
 
-        bool setSpeed(int16_t speed){
+        bool setSpeed(int16_t speed) {
             last_speed = speed;
         };
 
-        bool resendCommand(){
+        bool resendCommand() {
             sendCommand(last_steer, last_speed);
         };
 
@@ -139,29 +143,25 @@ namespace hoverboard_driver_node {
     private:
         std::string serial_name_;
         serial_t *serial_;
-        uint8_t hoverboard_data[RCV_BUFFER_SIZE];
+        uint8_t hoverboard_data[RCV_BUFFER_SIZE]{};
         int16_t last_steer;
         int16_t last_speed;
-        //TODO : param
-        unsigned int buffer_size;
     };
 
 } // namespace hoverboard_driver_node
 
-hoverboard_driver_node::Hoverboard *hoverboard_instance = NULL;
+hoverboard_driver_node::Hoverboard *hoverboard_instance = nullptr;
 
 std::string odom_frame, base_frame;
 
-float base_width;
-float wheel_radius;
-float wheel_circum;
-float rpm_per_meter;
-float encoder_cpm;
+double base_width;
+double wheel_radius;
+double wheel_circum;
+double rpm_per_meter;
+double encoder_cpm;
 double coeff;
 
 int encoder_cpr = 90;
-
-ros::Time current_time, last_time;
 
 //TODO: Odometry class
 double raw_wheel_L_ang_pos = std::numeric_limits<double>::max();
@@ -183,10 +183,10 @@ float global_x;
 float global_y;
 float global_theta;
 
-void initWheel(){
+void initWheel() {
     wheel_circum = 2.0 * wheel_radius * M_PI;
 
-    coeff = 2 * M_PI / encoder_cpr;
+    coeff = 2.0 * M_PI / encoder_cpr;
 
     encoder_cpm = encoder_cpr / wheel_circum;
 
@@ -195,38 +195,37 @@ void initWheel(){
     ROS_INFO("rpm_per_meter : %f", rpm_per_meter);
 }
 
-double getAngularPos(float pulse){
-    return -1 * coeff * pulse;
+double getAngularPos(double pulse) {
+    return coeff * pulse;
 }
 
-void setInstance(hoverboard_driver_node::Hoverboard *instance){
+void setInstance(hoverboard_driver_node::Hoverboard *instance) {
     hoverboard_instance = instance;
 }
 
 void velCallback(const geometry_msgs::Twist &vel) {
 
-    if(hoverboard_instance == NULL){
+    if (hoverboard_instance == nullptr) {
         return;
     }
 
-    float v = vel.linear.x;
-    float w = vel.angular.z;
+    double v = vel.linear.x;
+    double w = vel.angular.z;
 
-    float rps = v / rpm_per_meter;
+    double rps = v / rpm_per_meter;
 
     //So it's rpm - rotate per minute
-    float rpm = rps * 60;
+    double rpm = rps * 60;
 
-    if(rpm > 0.0 && rpm < 1.0){
+    if (rpm > 0.0 && rpm < 1.0) {
         rpm = 1;
-    } else
-    if(rpm  < 0.0 && rpm > -1.0){
+    } else if (rpm < 0.0 && rpm > -1.0) {
         rpm = -1;
     }
 
     int16_t speed = static_cast<int>(rpm);
     //TODO: calc
-    int16_t steer = static_cast<int>(-1 * w * 25);
+    int16_t steer = static_cast<int>(-1 * w * 30);
 
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
@@ -235,7 +234,8 @@ void velCallback(const geometry_msgs::Twist &vel) {
     hoverboard_instance->setSpeed(speed);
 }
 
-void sendOdometry(tf::TransformBroadcaster odom_broadcaster, ros::Publisher odometry_pub){
+void
+sendOdometry(tf::TransformBroadcaster odom_broadcaster, const ros::Publisher &odometry_pub, ros::Time current_time) {
 
     //since all odometry is 6DOF we'll need a quaternion created from yaw
     geometry_msgs::Quaternion odom_quat = tf::createQuaternionMsgFromYaw(robot_angular_pos);
@@ -282,17 +282,18 @@ void sendOdometry(tf::TransformBroadcaster odom_broadcaster, ros::Publisher odom
     odometry_pub.publish(odom);
 }
 
-void publishOdometry(ros::Publisher odometry_pub,
-                      hoverboard_driver::hoverboard_msg feedback,
-                      tf::TransformBroadcaster odom_broadcaster,
-                      const ros::Time current_time,
-                      const ros::Time last_time) {
+void publishOdometry(hoverboard_driver::hoverboard_msg feedback,
+                     const ros::Publisher &odometry_pub,
+                     tf::TransformBroadcaster odom_broadcaster,
+                     const ros::Time current_time,
+                     const ros::Time last_time) {
 
-    double curr_wheel_L_ang_pos = getAngularPos((double)feedback.pulseCountL);
-    double curr_wheel_R_ang_pos = getAngularPos((double)feedback.pulseCountR);
+    double curr_wheel_L_ang_pos = getAngularPos((double) feedback.pulseCountL);
+    double curr_wheel_R_ang_pos = getAngularPos((double) feedback.pulseCountR);
 
     //TODO: fix mess
-    if(raw_wheel_L_ang_pos == std::numeric_limits<double>::max() && raw_wheel_R_ang_pos == std::numeric_limits<double>::max()){
+    if (raw_wheel_L_ang_pos == std::numeric_limits<double>::max() &&
+        raw_wheel_R_ang_pos == std::numeric_limits<double>::max()) {
         raw_wheel_L_ang_pos = curr_wheel_L_ang_pos;
         raw_wheel_R_ang_pos = curr_wheel_R_ang_pos;
         return;
@@ -314,9 +315,8 @@ void publishOdometry(ros::Publisher odometry_pub,
     wheel_L_ang_vel = delta_L_ang_pos / (dtime);
     wheel_R_ang_vel = delta_R_ang_pos / (dtime);
 
-    wheel_L_ang_pos = wheel_L_ang_pos + delta_L_ang_pos;
-    wheel_R_ang_pos = wheel_R_ang_pos + delta_R_ang_pos;
-
+    wheel_L_ang_pos += delta_L_ang_pos;
+    wheel_R_ang_pos += delta_R_ang_pos;
 
     robot_angular_vel = (((wheel_R_ang_pos - wheel_L_ang_pos) * wheel_radius / base_width) - robot_angular_pos) / dtime;
     robot_angular_pos = (wheel_R_ang_pos - wheel_L_ang_pos) * wheel_radius / base_width;
@@ -328,7 +328,7 @@ void publishOdometry(ros::Publisher odometry_pub,
     robot_y_pos = robot_y_pos + robot_y_vel * dtime;
 
     // send odometry
-    sendOdometry(odom_broadcaster, odometry_pub);
+    sendOdometry(std::move(odom_broadcaster), odometry_pub, current_time);
 
 }
 
@@ -357,14 +357,14 @@ int main(int argc, char **argv) {
 
     setInstance(&hoverboard);
 
-    node.param<float>("base_width", base_width, 0.43);
-    node.param<float>("wheel_radius", wheel_radius, 0.235 / 2);
+    node.param<double>("base_width", base_width, 0.43);
+    node.param<double>("wheel_radius", wheel_radius, 0.235 / 2);
     node.param("encoder_cpr", encoder_cpr, 90);
 
     initWheel();
 
-    current_time = ros::Time::now();
-    last_time = ros::Time::now();
+    ros::Time current_time = ros::Time::now();
+    ros::Time last_time = ros::Time::now();
 
     ros::Publisher hoverboard_pub = node.advertise<hoverboard_driver::hoverboard_msg>("hoverboard_msg", 20);
 
@@ -382,17 +382,29 @@ int main(int argc, char **argv) {
     while (ros::ok()) {
 
         //command hoverboard
-        if(counter++ > 5) {
+        if (counter++ > 5) {
             bool send_ok = hoverboard.resendCommand();
             counter = 0;
         }
 
+        current_time = ros::Time::now();
+
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&read_hoverboard_error);
 
         if (!read_hoverboard_error) {
-            current_time = ros::Time::now();
-            publishMessage(hoverboard_pub, feedback);
-            publishOdometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
+
+            publishMessage(
+                    hoverboard_pub,
+                    feedback
+            );
+
+            publishOdometry(
+                    feedback,
+                    hoverboard_odometry,
+                    odom_broadcaster,
+                    current_time,
+                    last_time);
+
             last_time = current_time;
         }
 
