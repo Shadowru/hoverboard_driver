@@ -390,8 +390,10 @@ int main(int argc, char **argv) {
         hoverboard_driver::hoverboard_msg feedback = hoverboard.read_data(&read_hoverboard_error);
 
         if (!read_hoverboard_error) {
+            current_time = ros::Time::now();
             publishMessage(hoverboard_pub, feedback);
             publishOdometry(hoverboard_odometry, feedback, odom_broadcaster, current_time, last_time);
+            last_time = current_time;
         }
 
         ros::spinOnce();
