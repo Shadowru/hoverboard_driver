@@ -227,6 +227,15 @@ void velCallback(const geometry_msgs::Twist &vel) {
     //TODO: calc
     int16_t steer = static_cast<int>(-1 * w * 30);
 
+    int16_t min_steer = 3;
+
+    if(w > 0.0 && steer == 0){
+        steer = -min_steer;
+    } else
+    if(w < 0.0 && steer == 0){
+        steer = min_steer;
+    }
+
     ROS_INFO("Set speed : %d", speed);
     ROS_INFO("Set steer : %d", steer);
 
