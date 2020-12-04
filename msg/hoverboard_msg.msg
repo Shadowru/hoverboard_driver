@@ -1,13 +1,12 @@
 #Header header    # ROS Message header
 
-int16 	cmd1
-int16 	cmd2
-int16 	speedR_meas
-int16 	speedL_meas
+int16 	state1
+int16 	state2
+int16 	speed1
+int16 	speed2
 int16 	batVoltage
 int16 	boardTemp
-uint16  cmdLed
-int16 	errorR
-int16 	errorL
+int16 	error1
+int16 	error2
 int32 	pulseCountR
 int32 	pulseCountL

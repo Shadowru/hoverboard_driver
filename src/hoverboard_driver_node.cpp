@@ -61,16 +61,16 @@ namespace hoverboard_driver_node {
 
             int idx = 1;
 
-            msg.cmd1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.cmd2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.speedR_meas = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.speedL_meas = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.state1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.state2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.rpm1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.rpm2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.cmdLed = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            uint16_t divider  = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
-            msg.errorR = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.errorL = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.error1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.error2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
             msg.pulseCountR = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
                               (hoverboard_data[idx++] << 24);
@@ -80,8 +80,8 @@ namespace hoverboard_driver_node {
             uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
             uint16_t calc_checksum =
-                    FULL_HEADER ^msg.cmd1 ^msg.cmd2 ^msg.speedR_meas ^msg.speedL_meas ^msg.batVoltage ^msg.boardTemp ^
-                    msg.cmdLed;
+                    FULL_HEADER ^msg.state1 ^msg.state2 ^msg.rpm1 ^msg.rpm2 ^msg.batVoltage ^msg.boardTemp ^
+                    divider;
 
             if (msg_checksum != calc_checksum) {
                 ROS_ERROR("Checksum wrong!: ");
