@@ -6,8 +6,8 @@
 
 #define ODOM_COV 0.005
 
-#define FULL_HEADER 0xABCD
-#define HEADER_START 0xCD
+#define FULL_HEADER 0xCAFE
+#define HEADER_START 0xFE
 #define HEADER_READ_TIMEOUT 1
 #define BODY_READ_TIMEOUT 300
 #define PACKET_SIZE 29
@@ -80,7 +80,7 @@ namespace hoverboard_driver_node {
             uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
             uint16_t calc_checksum =
-                    0xABCD ^msg.cmd1 ^msg.cmd2 ^msg.speedR_meas ^msg.speedL_meas ^msg.batVoltage ^msg.boardTemp ^
+                    FULL_HEADER ^msg.cmd1 ^msg.cmd2 ^msg.speedR_meas ^msg.speedL_meas ^msg.batVoltage ^msg.boardTemp ^
                     msg.cmdLed;
 
             if (msg_checksum != calc_checksum) {
