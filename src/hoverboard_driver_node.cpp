@@ -297,8 +297,8 @@ void publishOdometry(hoverboard_driver::hoverboard_msg feedback,
                      const ros::Time current_time,
                      const ros::Time last_time) {
 
-    double curr_wheel_L_ang_pos = getAngularPos((double) feedback.pulseCountL);
-    double curr_wheel_R_ang_pos = getAngularPos((double) feedback.pulseCountR);
+    double curr_wheel_L_ang_pos = getAngularPos((double) feedback.pulseCount1);
+    double curr_wheel_R_ang_pos = getAngularPos((double) feedback.pulseCount2);
 
     //TODO: fix mess
     if (raw_wheel_L_ang_pos == std::numeric_limits<double>::max() &&
