@@ -8,5 +8,5 @@ int16 	batVoltage
 int16 	boardTemp
 int16 	error1
 int16 	error2
-int32 	pulseCountR
-int32 	pulseCountL
+int32 	pulseCount1
+int32 	pulseCount2

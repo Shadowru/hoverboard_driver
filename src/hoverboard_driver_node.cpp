@@ -72,9 +72,9 @@ namespace hoverboard_driver_node {
             msg.error1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.error2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
-            msg.pulseCountR = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
+            msg.pulseCount1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
                               (hoverboard_data[idx++] << 24);
-            msg.pulseCountL = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
+            msg.pulseCount2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8) + (hoverboard_data[idx++] << 16) +
                               (hoverboard_data[idx++] << 24);
 
             uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
