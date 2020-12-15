@@ -12,7 +12,6 @@
 #define BODY_READ_TIMEOUT 300
 #define PACKET_SIZE 29
 
-
 namespace hoverboard_driver_node {
 
     class Hoverboard {
@@ -63,8 +62,8 @@ namespace hoverboard_driver_node {
 
             msg.state1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.state2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.rpm1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
-            msg.rpm2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.speed1 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
+            msg.speed2 = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.batVoltage = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             msg.boardTemp = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
             uint16_t divider  = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
@@ -80,7 +79,7 @@ namespace hoverboard_driver_node {
             uint16_t msg_checksum = hoverboard_data[idx++] + (hoverboard_data[idx++] << 8);
 
             uint16_t calc_checksum =
-                    FULL_HEADER ^msg.state1 ^msg.state2 ^msg.rpm1 ^msg.rpm2 ^msg.batVoltage ^msg.boardTemp ^
+                    FULL_HEADER ^msg.state1 ^msg.state2 ^msg.speed1 ^msg.speed2 ^msg.batVoltage ^msg.boardTemp ^
                     divider;
 
             if (msg_checksum != calc_checksum) {
